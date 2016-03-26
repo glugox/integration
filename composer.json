@@ -13,15 +13,12 @@
         "AFL-3.0"
     ],
     "autoload": {
-        "files": ["registration.php"]
-    },
-    "extra": {
-        "map": [
-            [
-                "*",
-                "Glugox/Integration"
-            ]
-        ]
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Glugox\\Intergation\\": ""
+        }
     },
     "authors": [
         {

@@ -11,7 +11,9 @@
     <acl>
         <resources>
             <resource id="Magento_Backend::admin">
-                <resource id="Glugox_Integration::glugox" title="Glugox" sortOrder="41" />
+                <resource id="Glugox_Core::glugox">
+                    <resource id="Glugox_Integration::integration" title="Integration" sortOrder="41" />
+                </resource>
             </resource>
         </resources>
     </acl>

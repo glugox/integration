@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+ * This file is part of Glugox.
+ *
+ * (c) Glugox <glugox@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Glugox_Integration::integration.css"/>
+    </head>
+    <body>
+        <referenceBlock name="content">
+            <block class="Magento\Backend\Block\Template" name="glugox_integration.popup.container" template="Glugox_Integration::popup_container.phtml" before="-"/>
+            <block class="Glugox\Integration\Block\Adminhtml\Board" name="glugox_integration.board"/>
+        </referenceBlock>
+    </body>
+</page>

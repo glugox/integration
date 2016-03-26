@@ -1,10 +1,18 @@
 <?xml version="1.0"?>
+<!--
+ * This file is part of Glugox.
+ *
+ * (c) Glugox <glugox@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+-->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Store/etc/config.xsd">
     <default>
-        <glugox_integration>
-            <general>
+        <glugox>
+            <integration>
                 <enebled>1</enebled>
-            </general>
-        </glugox_integration>
+            </integration>
+        </glugox>
     </default>
 </config>

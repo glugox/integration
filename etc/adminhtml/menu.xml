@@ -9,6 +9,6 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
-        <add id="Glugox_Integration:glugox" title="Integration" module="Glugox_Integration" sortOrder="41" parent="Glugox_Core:glugox" dependsOnModule="Glugox_Core" resource="Glugox_Integration::glugox" />
+        <add id="Glugox_Integration::integration" title="Integration" module="Glugox_Integration" sortOrder="10" parent="Glugox_Core::glugox_data" action="glugox_integration/index/" dependsOnModule="Glugox_Integration" resource="Glugox_Integration::integration" />
     </menu>
 </config>
