@@ -1,4 +1,4 @@
-# core
+# Magento 2 Integration
 
 Magento 2 Integration home. This is ment to be integration core functionality 
 on which can depend custon mudules implementations, for maximum reusability.
