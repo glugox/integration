@@ -17,7 +17,7 @@
             "registration.php"
         ],
         "psr-4": {
-            "Glugox\\Intergation\\": ""
+            "Glugox\\Integration\\": ""
         }
     },
     "authors": [
