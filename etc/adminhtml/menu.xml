@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of Glugox.
+ *
+ * (c) Glugox <glugox@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Glugox_Integration:glugox" title="Integration" module="Glugox_Integration" sortOrder="41" parent="Glugox_Core:glugox" dependsOnModule="Glugox_Core" resource="Glugox_Integration::glugox" />
+    </menu>
+</config>
