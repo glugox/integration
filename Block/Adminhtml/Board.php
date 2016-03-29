@@ -14,13 +14,17 @@ namespace Glugox\Integration\Block\Adminhtml;
  *
  * @codeCoverageIgnore
  */
-class Board extends \Magento\Backend\Block\Widget\Container
+class Board extends \Magento\Backend\Block\Widget\Grid\Container
 {
     /**
      * @return void
      */
     protected function _construct()
     {
+        $this->_controller = 'adminhtml_integration';
+        $this->_blockGroup = 'Adminhtml_Integration';
+        $this->_headerText = __('Integrations');
+        $this->_addButtonLabel = __('Add New Integration');
         parent::_construct();
     }
 }

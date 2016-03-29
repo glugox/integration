@@ -15,7 +15,7 @@ define([
     
     
     window.GlugoxIntegration = function (){
-        
+        //
     }
     
 });

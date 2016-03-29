@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+ * This file is part of Glugox.
+ *
+ * (c) Glugox <glugox@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="editor"/>
+    <body>
+        <referenceContainer name="left">
+            <block class="Glugox\Integration\Block\Adminhtml\Integration\Edit\Tabs" name="glugox_integration_edit_tabs">
+                <block class="Glugox\Integration\Block\Adminhtml\Integration\Edit\Tab\Main" name="glugox_integration_edit_tab_main">
+                </block>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">main_section</argument>
+                    <argument name="block" xsi:type="string">glugox_integration_edit_tab_main</argument>
+                </action>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="content">
+            <block class="Glugox\Integration\Block\Adminhtml\Integration\Edit" name="glugox_integration_edit_content"/>
+        </referenceContainer>
+    </body>
+</page>

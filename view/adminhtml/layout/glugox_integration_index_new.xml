@@ -7,15 +7,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
 -->
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
         <css src="Glugox_Integration::integration.css"/>
     </head>
-    <update handle="glugox_integration_grid_block"/>
+    <update handle="glugox_integration_index_edit"/>
     <body>
         <referenceBlock name="content">
             <block class="Magento\Backend\Block\Template" name="glugox_integration.popup.container" template="Glugox_Integration::integration/popup_container.phtml" before="-"/>
-            <block class="Glugox\Integration\Block\Adminhtml\Board" name="glugox_integration.board"/>
         </referenceBlock>
     </body>
 </page>

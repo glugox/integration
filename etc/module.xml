@@ -8,5 +8,5 @@
  * file that was distributed with this source code.
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="Glugox_Integration" setup_version="1.0.0"/>
+    <module name="Glugox_Integration" setup_version="0.0.0"/>
 </config>
