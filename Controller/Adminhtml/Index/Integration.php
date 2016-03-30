@@ -27,6 +27,8 @@ abstract class Integration extends Action
     /** @var \Glugox\Integration\Api\IntegrationServiceInterface */
     protected $_integrationService;
 
+    /** @var \Magento\Framework\Json\Helper\Data */
+    protected $jsonHelper;
     /**
      * @var \Magento\Framework\Escaper
      */
@@ -37,6 +39,7 @@ abstract class Integration extends Action
      * @param \Magento\Framework\Registry $registry
      * @param \Psr\Log\LoggerInterface $logger
      * @param \Glugox\Integration\Api\IntegrationServiceInterface $integrationService
+     * @param \Magento\Framework\Json\Helper\Data $jsonHelper
      * @param \Magento\Framework\Escaper $escaper
      */
     public function __construct(
@@ -44,12 +47,14 @@ abstract class Integration extends Action
         \Magento\Framework\Registry $registry,
         \Psr\Log\LoggerInterface $logger,
         \Glugox\Integration\Api\IntegrationServiceInterface $integrationService,
+        \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Magento\Framework\Escaper $escaper
     ) {
         parent::__construct($context);
         $this->_registry = $registry;
         $this->_logger = $logger;
         $this->_integrationService = $integrationService;
+        $this->jsonHelper = $jsonHelper;
         $this->escaper = $escaper;
     }
 
