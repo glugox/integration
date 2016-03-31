@@ -6,3 +6,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+.glugox-integration-monitor{
+    background: #f8f8f8 none repeat scroll 0 0;
+    border-bottom: 1px solid #e3e3e3;
+    border-top: 1px solid #e3e3e3;
+    padding: 1.5rem;
+    margin-bottom: 3rem;
+}

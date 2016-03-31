@@ -10,7 +10,8 @@
 var config = {
     map: {
         '*': {
-            glugoxIntegration: 'Glugox_Integration/js/glugoxIntegration'
+            'glugoxIntegration': 'Glugox_Integration/js/glugoxIntegration',
+            'glugoxIntegrationMonitor': 'Glugox_Integration/js/glugoxIntegrationMonitor'
         }
-    } 
+    }
 };

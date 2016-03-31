@@ -1,0 +1,24 @@
+<?php
+/**
+ * This file is part of Glugox.
+ *
+ * (c) Glugox <glugox@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+// @codingStandardsIgnoreFile
+?>
+<script>
+    require([
+        "jquery",
+        "glugoxIntegration"
+    ], function ($, Confirm) {
+
+    });
+</script>
+
+
+<div data-mage-init='{"glugoxIntegrationMonitor": {"monitorUrl":"<?php /* @escapeNotVerified */ echo $this->helper('Glugox\Integration\Helper\Data')->getMonitorUrl() ?>"}}' class="glugox-integration-monitor" style="display: block;">
+    <h3>Glugox Integration Monitor</h3>
+</div>
