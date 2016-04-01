@@ -61,6 +61,13 @@ interface IntegrationServiceInterface {
     public function getAllIntegrations();
 
     /**
+     * Gets all Integrations as array of associative arrays data.
+     *
+     * @return array
+     */
+    public function getAllIntegrationRows();
+
+    /**
      * Update an Integration.
      *
      * @param array $integrationData

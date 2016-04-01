@@ -116,6 +116,15 @@ class IntegrationService implements IntegrationServiceInterface {
      * @return array
      */
     public function getAllIntegrations() {
+        $integrations = $this->_integrationFactory->create()->getCollection();
+        return $integrations;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getAllIntegrationRows() {
         $integrations = $this->_integrationFactory->create()->getAllIntegrations();
         return $integrations;
     }

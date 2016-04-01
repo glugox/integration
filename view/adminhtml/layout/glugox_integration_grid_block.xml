@@ -38,6 +38,15 @@
                             <argument name="escape" xsi:type="string">1</argument>
                         </arguments>
                     </block>
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="monitor">
+                        <arguments>
+                            <argument name="renderer" xsi:type="string">Glugox\Integration\Block\Adminhtml\Widget\Grid\Column\Renderer\Monitor</argument>
+                            <argument name="index" xsi:type="string">monitor</argument>
+                            <argument name="id" xsi:type="string">monitor</argument>
+                            <argument name="sortable" xsi:type="string">0</argument>
+                            <argument name="filter" xsi:type="string">0</argument>
+                        </arguments>
+                    </block>
                     <block class="Magento\Backend\Block\Widget\Grid\Column" as="status">
                         <arguments>
                             <argument name="header" xsi:type="string" translate="true">Status</argument>
@@ -45,15 +54,6 @@
                             <argument name="options" xsi:type="options" model="Glugox\Integration\Model\Integration\Source\Status"/>
                             <argument name="index" xsi:type="string">status</argument>
                             <argument name="id" xsi:type="string">status</argument>
-                        </arguments>
-                    </block>
-                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="activate">
-                        <arguments>
-                            <argument name="renderer" xsi:type="string">Glugox\Integration\Block\Adminhtml\Widget\Grid\Column\Renderer\Link\Activate</argument>
-                            <argument name="index" xsi:type="string">activate</argument>
-                            <argument name="id" xsi:type="string">activate</argument>
-                            <argument name="sortable" xsi:type="string">0</argument>
-                            <argument name="filter" xsi:type="string">0</argument>
                         </arguments>
                     </block>
                     <block class="Magento\Backend\Block\Widget\Grid\Column" as="edit">

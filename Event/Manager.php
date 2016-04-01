@@ -41,8 +41,8 @@ class Manager implements ManagerInterface {
         $this->_helper->info("Loading Integrations...");
         $integrations = $this->_service->getAllIntegrations();
         $this->_helper->info("Loaded " . \count($integrations) . ' Integrations!');
-        foreach ($integrations as $row) {
-            $this->_helper->info($row);
+        foreach ($integrations as $integration) {
+            $this->_helper->info($integration->getIntegrationCode());
         }
     }
 

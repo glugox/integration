@@ -29,6 +29,11 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
     const DATA_STATUS = 'status';
     const DATA_SERVICE_URL = 'service_url';
 
+    const DATA_CA_FILE = 'ca_file';
+    const DATA_CLIENT_FILE = 'client_file';
+    const DATA_KEY_FILE = 'key_file';
+    const DATA_CERT_PASS = 'cert_pass';
+
     /*     * #@- */
 
     /**
@@ -130,6 +135,50 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
             'disabled' => $disabled,
             'note' => __(
                     'Main service URL'
+            )
+                ]
+        );
+
+        $fieldset->addField(
+                self::DATA_CA_FILE, 'text', [
+            'label' => __('CA File'),
+            'name' => self::DATA_CA_FILE,
+            'disabled' => $disabled,
+            'note' => __(
+                    'CA File'
+            )
+                ]
+        );
+
+        $fieldset->addField(
+                self::DATA_CLIENT_FILE, 'text', [
+            'label' => __('Client File'),
+            'name' => self::DATA_CLIENT_FILE,
+            'disabled' => $disabled,
+            'note' => __(
+                    'Client File'
+            )
+                ]
+        );
+
+        $fieldset->addField(
+                self::DATA_KEY_FILE, 'text', [
+            'label' => __('Key File'),
+            'name' => self::DATA_KEY_FILE,
+            'disabled' => $disabled,
+            'note' => __(
+                    'Key File'
+            )
+                ]
+        );
+
+        $fieldset->addField(
+                self::DATA_CERT_PASS, 'text', [
+            'label' => __('Cert Pass'),
+            'name' => self::DATA_CERT_PASS,
+            'disabled' => $disabled,
+            'note' => __(
+                    'Cert Pass'
             )
                 ]
         );

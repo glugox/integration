@@ -7,20 +7,20 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Glugox\Integration\Block\Adminhtml\Widget\Grid\Column\Renderer\Link;
+namespace Glugox\Integration\Block\Adminhtml\Widget\Grid\Column\Renderer;
 
 use Magento\Framework\DataObject;
 use Glugox\Integration\Block\Adminhtml\Widget\Grid\Column\Renderer\Link;
 use Glugox\Integration\Model\Integration;
 
-class Activate extends Link
+class Monitor extends Link
 {
     /**
      * {@inheritDoc}
      */
     public function getCaption()
     {
-        return $this->_row->getStatus() == Integration::STATUS_INACTIVE ? __('Activate') : __('Deactivate');
+        return $this->_row->getStatus() == Integration::STATUS_INACTIVE ? __('Inactive') : __('Active');
     }
 
     /**
