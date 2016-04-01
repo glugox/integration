@@ -11,45 +11,40 @@
 
 namespace Glugox\Integration\Controller\Adminhtml\Index;
 
-use Glugox\Integration\Block\Adminhtml\Integration\Edit\Tab\Main;
 use Glugox\Integration\Exception\IntegrationException;
-use Magento\Framework\Controller\ResultFactory;
 use Glugox\Integration\Model\Integration as IntegrationModel;
 
-class Delete extends \Glugox\Integration\Controller\Adminhtml\Index\Integration {
+class Start extends \Glugox\Integration\Controller\Adminhtml\Index\Integration {
 
     /**
-     * Delete the integration.
+     * Starts the integration.
      *
      * @return \Magento\Backend\Model\View\Result\Redirect
      */
     public function execute() {
-        /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
-        $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+
+        $result = [
+            'current_integration' => 0,
+            'current_integration_progress' => 0,
+            'overall_integration_progress' => 0,
+        ];
         $integrationId = (int) $this->getRequest()->getParam('id');
         try {
             if ($integrationId) {
-                $integrationData = $this->_service->delete($integrationId);
+                $integrationData = $this->_service->get($integrationId);
                 if (!$integrationData[Main::DATA_ID]) {
                     $this->messageManager->addError(__('This integration no longer exists.'));
                 } else {
-                    $this->_registry->register(IntegrationModel::CURRENT_INTEGRATION_KEY, $integrationData);
-                    $this->messageManager->addSuccess(
-                            __(
-                                    "The integration '%1' has been deleted.", $this->escaper->escapeHtml($integrationData[Main::DATA_NAME])
-                            )
-                    );
+                    //
                 }
             } else {
-                $this->messageManager->addError(__('Integration ID is not specified or is invalid.'));
+                // we are running all integrations
             }
         } catch (IntegrationException $e) {
             $this->messageManager->addError($e->getMessage());
         } catch (\Exception $e) {
             $this->getLogger()->critical($e);
         }
-
-        return $resultRedirect->setPath('*/*/');
     }
 
 

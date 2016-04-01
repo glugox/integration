@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Glugox\Integration\Controller\Adminhtml\Monitor;
+namespace Glugox\Integration\Controller\Adminhtml\Ajax;
 
 use Glugox\Integration\Controller\Adminhtml\Index\Integration;
 
@@ -26,14 +26,11 @@ class Index extends Integration {
     public function execute() {
 
 
-        $this->_manager->start();
+        $result = $this->_manager->run();
 
         if ($this->getRequest()->isXmlHttpRequest()) {
-            $this->getResponse()->representJson(
-                    $this->jsonHelper->jsonEncode(
-                            ['progress' => 63]
-                    )
-            );
+            $jsonResult = $this->jsonHelper->jsonEncode($result);
+            $this->getResponse()->representJson($jsonResult);
         } else {
             $this->_redirect('*/*/');
         }

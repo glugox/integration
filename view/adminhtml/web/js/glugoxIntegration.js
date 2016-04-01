@@ -31,7 +31,7 @@ define([
          * @private
          */
         _create: function () {
-            console.log("GlugoxIntegration._create");
+            var that = this;
             if ($('#save-split-button-activate').length) {
                 // We're on the "New integration" page - bind related handler
                 this._form = $('#edit_form');
@@ -82,5 +82,62 @@ define([
     });
 
 
+    window.glugoxIntegration = {
+        /**
+         * Options
+         * @type {Object}
+         */
+        options: {
+            /**
+             * URL of the integration ajax.
+             * @type {String}
+             */
+            ajaxUrl: '',
+            monitorLocator: '.glugox-integration-monitor',
+        },
+        /**
+         *
+         * @returns {undefined}
+         */
+        run: function (ajaxUrl) {
+            this.options.ajaxUrl = ajaxUrl;
+            this._run();
+        },
+        /**
+         *
+         * @returns {undefined}
+         */
+        _run: function () {
+            console.log("GlugoxIntegration._run : " + this.options.ajaxUrl);
+            $("#g-integration-run-button").prop('disabled', true);
+            if ($(this.options.monitorLocator).length) {
+                $(this.options.monitorLocator).glugoxIntegrationMonitor("wakeUp");
+            }
+            $.ajax({
+                url: this.options.ajaxUrl,
+                type: 'get',
+                data: '',
+                dataType: 'json',
+                context: this,
+                beforeSend: function () {
+                    $('body').trigger('processStart');
+                },
+                success: function (data) {
+                    if (data['_redirect']) {
+                        window.location.href = data['_redirect'];
+                    }
+                },
+                error: function (jqXHR, status, error) {
+                    alert({
+                        content: $.mage.__('Sorry, something went wrong. Please try again later.')
+                    });
+                    window.console && console.log(status + ': ' + error + "\nResponse text:\n" + jqXHR.responseText);
+                },
+                complete: function () {
+                    $('body').trigger('processStop');
+                }
+            });
+        },
+    }
 
 });

@@ -13,6 +13,9 @@
             <integration>
                 <enebled>1</enebled>
             </integration>
+            <integration_activity>
+                <current>0</current>
+            </integration_activity>
         </glugox>
     </default>
 </config>

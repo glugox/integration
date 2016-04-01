@@ -14,6 +14,9 @@
     <update handle="glugox_integration_monitor_block"/>
     <update handle="glugox_integration_grid_block"/>
     <body>
+        <referenceContainer name="page.main.actions">
+            <block class="Magento\Backend\Block\Template" name="run" template="Glugox_Integration::integration/totalbar/run.phtml"/>
+        </referenceContainer>
         <referenceBlock name="content">
             <block class="Magento\Backend\Block\Template" name="glugox_integration.popup.container" template="Glugox_Integration::integration/popup_container.phtml" before="-"/>
             <block class="Glugox\Integration\Block\Adminhtml\Board" name="glugox_integration.board"/>

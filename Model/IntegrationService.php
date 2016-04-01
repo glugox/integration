@@ -38,6 +38,7 @@ class IntegrationService implements IntegrationServiceInterface {
         $this->_integrationFactory = $objectManager;
     }
 
+
     /**
      * {@inheritdoc}
      */
@@ -47,6 +48,7 @@ class IntegrationService implements IntegrationServiceInterface {
         $integration->save();
         return $integration;
     }
+
 
     /**
      * {@inheritdoc}
@@ -62,6 +64,7 @@ class IntegrationService implements IntegrationServiceInterface {
         return $integration;
     }
 
+
     /**
      * {@inheritdoc}
      */
@@ -72,6 +75,7 @@ class IntegrationService implements IntegrationServiceInterface {
         return $data;
     }
 
+
     /**
      * {@inheritdoc}
      */
@@ -80,6 +84,7 @@ class IntegrationService implements IntegrationServiceInterface {
         return $integration;
     }
 
+
     /**
      * {@inheritdoc}
      */
@@ -87,7 +92,8 @@ class IntegrationService implements IntegrationServiceInterface {
         $integration = $this->_integrationFactory->create()->load($name, 'name');
         return $integration;
     }
-    
+
+
     /**
      * {@inheritdoc}
      */
@@ -96,13 +102,24 @@ class IntegrationService implements IntegrationServiceInterface {
         return $integration;
     }
 
+
     /**
      * {@inheritdoc}
      */
-    public function findActiveIntegration() {
-        $integration = $this->_integrationFactory->create()->loadActiveIntegration();
+    public function selectActiveIntegration() {
+        $integration = $this->_integrationFactory->create()->selectActiveIntegration();
         return $integration;
     }
+
+
+    /**
+     * @return array
+     */
+    public function getAllIntegrations() {
+        $integrations = $this->_integrationFactory->create()->getAllIntegrations();
+        return $integrations;
+    }
+
 
     /**
      * Check if an integration exists by the name
@@ -118,6 +135,7 @@ class IntegrationService implements IntegrationServiceInterface {
         }
     }
 
+
     /**
      * Load integration by id.
      *
@@ -132,5 +150,6 @@ class IntegrationService implements IntegrationServiceInterface {
         }
         return $integration;
     }
+
 
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of Glugox.
  *
@@ -7,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Glugox\Integration\Api;
 
 use Glugox\Integration\Model\Integration as IntegrationModel;
@@ -16,8 +18,8 @@ use Glugox\Integration\Model\Integration as IntegrationModel;
  *
  * @api
  */
-interface IntegrationServiceInterface
-{
+interface IntegrationServiceInterface {
+
     /**
      * Create a new Integration
      *
@@ -44,13 +46,19 @@ interface IntegrationServiceInterface
      */
     public function findByCode($integrationCode);
 
-
     /**
      * Get the details of an active Integration.
      *
      * @return IntegrationModel
      */
-    public function findActiveIntegration();
+    public function selectActiveIntegration();
+
+    /**
+     * Gets all Integrations.
+     *
+     * @return array
+     */
+    public function getAllIntegrations();
 
     /**
      * Update an Integration.
@@ -69,6 +77,4 @@ interface IntegrationServiceInterface
      * @throws \Glugox\Integration\Exception\IntegrationException
      */
     public function delete($integrationId);
-
-    
 }

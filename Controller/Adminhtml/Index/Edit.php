@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of Glugox.
  *
@@ -7,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Glugox\Integration\Controller\Adminhtml\Index;
 
 use Magento\Backend\App\Action;
@@ -15,28 +17,26 @@ use Glugox\Integration\Exception\IntegrationException;
 use Glugox\Integration\Controller\Adminhtml\Index\Integration;
 use Glugox\Integration\Model\Integration as IntegrationModel;
 
-class Edit extends Integration
-{
-    
+class Edit extends Integration {
+
     /**
      * Edit integration action.
      *
      * @return void
      */
-    public function execute()
-    {
+    public function execute() {
         /** Try to recover integration data from session if it was added during previous request which failed. */
-        $integrationId = (int)$this->getRequest()->getParam('id');
+        $integrationId = (int) $this->getRequest()->getParam('id');
         if ($integrationId) {
             try {
-                $integrationData = $this->_integrationService->get($integrationId)->getData();
+                $integrationData = $this->_service->get($integrationId)->getData();
                 $originalName = $this->escaper->escapeHtml($integrationData[Main::DATA_NAME]);
             } catch (IntegrationException $e) {
                 $this->messageManager->addError($this->escaper->escapeHtml($e->getMessage()));
                 $this->_redirect('*/*/');
                 return;
             } catch (\Exception $e) {
-                $this->_logger->critical($e);
+                $this->getLogger()->critical($e);
                 $this->messageManager->addError(__('Internal error. Check exception log for details.'));
                 $this->_redirect('*/*');
                 return;
@@ -61,4 +61,6 @@ class Edit extends Integration
         $this->_view->getPage()->getConfig()->getTitle()->prepend($title);
         $this->_view->renderLayout();
     }
+
+
 }

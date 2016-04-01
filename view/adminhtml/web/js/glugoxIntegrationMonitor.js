@@ -36,6 +36,20 @@ define([
             this._update();
         },
         /**
+         * Wake up!
+         * @public
+         */
+        wakeUp: function () {
+            this._log("Wake up!");
+        },
+        /**
+         * Sleep!
+         * @public
+         */
+        sleep: function () {
+            this._log("Sleep!");
+        },
+        /**
          * Updates monitor data after 'updateFrequency' time
          * @private
          */
@@ -67,7 +81,7 @@ define([
                     that._log(status + ': ' + error + "\nResponse text:\n" + jqXHR.responseText);
                 },
                 complete: function () {
-                    that._updateLater();
+                    //that._updateLater();
                 }
             });
         },

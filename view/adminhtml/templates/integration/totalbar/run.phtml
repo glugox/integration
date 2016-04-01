@@ -1,0 +1,31 @@
+<?php
+/**
+ * This file is part of Glugox.
+ *
+ * (c) Glugox <glugox@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+?>
+<script>
+    require([
+        "glugoxIntegration"
+    ], function ($) {
+
+    });
+</script>
+<div class="page-actions page-actions-run">
+    <div class="page-actions-inner">
+        <div class="page-actions-buttons">
+            <button
+                class="action-primary"
+                id="g-integration-run-button"
+                onclick='glugoxIntegration.run("<?php echo $this->helper('Glugox\Integration\Helper\Data')->getIntegrationAjaxUrl() ?>");'
+                <?php echo $this->helper('Glugox\Integration\Helper\Data')->isDisabled() ? 'disabled="disabled"' : '' ?>
+                title="Run">
+                    <?php /* @escapeNotVerified */ echo __('Run') ?>
+            </button>
+        </div>
+    </div>
+</div>
