@@ -30,8 +30,8 @@ class InstallSchema implements InstallSchemaInterface
 
         /**
          * Create table 'glugox_integration'
-         * 
-         * +------------------+----------------------+------+-----+---------------------+-----------------------------+
+         *
+         *  +------------------+----------------------+------+-----+---------------------+-----------------------------+
             | Field            | Type                 | Null | Key | Default             | Extra                       |
             +------------------+----------------------+------+-----+---------------------+-----------------------------+
             | integration_id   | int(10) unsigned     | NO   | PRI | NULL                | auto_increment              |
@@ -41,12 +41,14 @@ class InstallSchema implements InstallSchemaInterface
             | client_file      | varchar(255)         | YES  |     | NULL                |                             |
             | key_file         | varchar(255)         | YES  |     | NULL                |                             |
             | cert_pass        | varchar(255)         | YES  |     | NULL                |                             |
+            | importer_class   | varchar(255)         | YES  |     | NULL                |                             |
+            | enabled          | smallint(5) unsigned | NO   |     | NULL                |                             |
             | status           | smallint(5) unsigned | NO   |     | NULL                |                             |
             | created_at       | timestamp            | NO   |     | CURRENT_TIMESTAMP   |                             |
             | updated_at       | timestamp            | NO   |     | 0000-00-00 00:00:00 | on update CURRENT_TIMESTAMP |
             | service_url      | varchar(255)         | YES  |     | NULL                |                             |
             +------------------+----------------------+------+-----+---------------------+-----------------------------+
-         * 
+         *
          */
         $table = $installer->getConnection()->newTable(
             $installer->getTable('glugox_integration')
@@ -93,9 +95,21 @@ class InstallSchema implements InstallSchemaInterface
             ['nullable' => true],
             'Cert password if exists'
         )->addColumn(
+            'importer_class',
+            \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            255,
+            ['nullable' => true],
+            'Class that overrides basic importer class for customization'
+        )->addColumn(
+            'enabled',
+            \Magento\Framework\DB\Ddl\Table::TYPE_SMALLINT,
+            1,
+            ['unsigned' => true, 'nullable' => false],
+            'Wether integration is enabled or not'
+        )->addColumn(
             'status',
             \Magento\Framework\DB\Ddl\Table::TYPE_SMALLINT,
-            null,
+            1,
             ['unsigned' => true, 'nullable' => false],
             'Integration status'
         )->addColumn(
@@ -133,9 +147,9 @@ class InstallSchema implements InstallSchemaInterface
             ['integration_code'],
             ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
         );
-        
+
         $installer->getConnection()->createTable($table);
-        
+
         $installer->endSetup();
 
     }

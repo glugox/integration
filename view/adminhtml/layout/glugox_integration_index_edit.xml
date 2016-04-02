@@ -12,11 +12,15 @@
     <body>
         <referenceContainer name="left">
             <block class="Glugox\Integration\Block\Adminhtml\Integration\Edit\Tabs" name="glugox_integration_edit_tabs">
-                <block class="Glugox\Integration\Block\Adminhtml\Integration\Edit\Tab\Main" name="glugox_integration_edit_tab_main">
-                </block>
+                <block class="Glugox\Integration\Block\Adminhtml\Integration\Edit\Tab\Main" name="glugox_integration_edit_tab_main"></block>
+                <block class="Glugox\Integration\Block\Adminhtml\Integration\Edit\Tab\Security" name="glugox_integration_edit_tab_security"></block>
                 <action method="addTab">
                     <argument name="name" xsi:type="string">main_section</argument>
                     <argument name="block" xsi:type="string">glugox_integration_edit_tab_main</argument>
+                </action>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">import_security</argument>
+                    <argument name="block" xsi:type="string">glugox_integration_edit_tab_security</argument>
                 </action>
             </block>
         </referenceContainer>

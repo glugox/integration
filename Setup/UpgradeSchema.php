@@ -30,6 +30,32 @@ class UpgradeSchema implements UpgradeSchemaInterface {
         $installer->startSetup();
 
 
+        /**
+         * Create table glugox_import_products
+         *
+         *  +-------------------+------------------+------+-----+---------+----------------+
+            | Field             | Type             | Null | Key | Default | Extra          |
+            +-------------------+------------------+------+-----+---------+----------------+
+            | id                | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+            | importer_code     | varchar(255)     | NO   | MUL | NULL    |                |
+            | sku               | varchar(255)     | NO   |     | NULL    |                |
+            | category          | varchar(255)     | NO   |     | NULL    |                |
+            | name              | varchar(255)     | NO   | UNI | NULL    |                |
+            | warranty          | varchar(255)     | YES  |     | NULL    |                |
+            | brend             | varchar(255)     | YES  |     | NULL    |                |
+            | qttyinstock       | int(11)          | YES  |     | NULL    |                |
+            | tax               | decimal(12,4)    | NO   |     | 0.0000  |                |
+            | price             | decimal(12,4)    | NO   |     | 0.0000  |                |
+            | cost              | decimal(12,4)    | YES  |     | 0.0000  |                |
+            | description       | text             | YES  |     | NULL    |                |
+            | short_description | text             | YES  |     | NULL    |                |
+            | image_url         | varchar(255)     | YES  |     | NULL    |                |
+            | special_offer     | decimal(12,4)    | NO   |     | 0.0000  |                |
+            | time_changed      | datetime         | YES  |     | NULL    |                |
+            | invalidated       | int(11)          | YES  |     | NULL    |                |
+            +-------------------+------------------+------+-----+---------+----------------+
+         *
+         */
         $table = $installer->getConnection()->newTable(
             $installer->getTable('glugox_import_products')
         )->addColumn(
