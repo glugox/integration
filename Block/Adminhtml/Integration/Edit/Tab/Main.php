@@ -140,8 +140,6 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
                 ]
         );
 
-
-
         $fieldset->addField(
                 self::DATA_ENABLED, 'select', [
             'name' => self::DATA_ENABLED,

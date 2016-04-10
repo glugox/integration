@@ -25,9 +25,7 @@ class Index extends Integration {
      */
     public function execute() {
 
-
         $result = $this->_manager->run();
-
         if ($this->getRequest()->isXmlHttpRequest()) {
             $jsonResult = $this->jsonHelper->jsonEncode($result);
             $this->getResponse()->representJson($jsonResult);

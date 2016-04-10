@@ -9,4 +9,11 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../lib/internal/Magento/Framework/ObjectManager/etc/config.xsd">
     <preference for="Glugox\Integration\Api\IntegrationServiceInterface" type="Glugox\Integration\Model\IntegrationService" />
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="glugox_integration_import" xsi:type="object">Glugox\Integration\Console\Command\ImportCommand</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
