@@ -12,36 +12,13 @@
 namespace Glugox\Integration\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
+use Glugox\Integration\Model\Integration\Import\Importer;
 
 /**
  * @SuppressWarnings(PHPMD.LongVariable)
  */
 class Data extends AbstractHelper {
 
-    /**
-     * @var \Magento\Framework\App\Route\Config
-     */
-    protected $_routeConfig;
-
-    /**
-     * @var \Magento\Framework\Locale\ResolverInterface
-     */
-    protected $_locale;
-
-    /**
-     * @var \Magento\Backend\Model\UrlInterface
-     */
-    protected $_backendUrl;
-
-    /**
-     * @var string
-     */
-    protected $_ajaxUrl;
-
-    /**
-     * @var string
-     */
-    protected $_monitorUrl;
 
     /**
      * @var \Magento\Framework\ObjectManagerInterface
@@ -49,58 +26,45 @@ class Data extends AbstractHelper {
     protected $_objectManager;
 
     /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
-     */
-    protected $_scopeConfig;
-
-    /**
-     * @var \Magento\Config\Model\ResourceModel\Config
-     */
-    protected $_resourceConfig;
-
-    /**
-     * @var array
-     */
-    private $_configCache;
-
-    /**
+     *
      * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Magento\Framework\App\Route\Config $routeConfig
-     * @param \Magento\Framework\Locale\ResolverInterface $locale
-     * @param \Magento\Backend\Model\UrlInterface $backendUrl
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \Magento\Config\Model\ResourceModel\Config $resourceConfig
      */
     public function __construct(
-    \Magento\Framework\App\Helper\Context $context,
-            \Magento\Framework\App\Route\Config $routeConfig,
-            \Magento\Framework\Locale\ResolverInterface $locale,
-            \Magento\Backend\Model\UrlInterface $backendUrl,
-            \Magento\Framework\ObjectManagerInterface $objectManager,
-            \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-            \Magento\Config\Model\ResourceModel\Config $resourceConfig
+            \Magento\Framework\App\Helper\Context $context,
+            \Magento\Framework\ObjectManagerInterface $objectManager
     ) {
         parent::__construct($context);
-        $this->_routeConfig = $routeConfig;
-        $this->_locale = $locale;
-        $this->_backendUrl = $backendUrl;
-        $this->_objectManager = $objectManager;
-        $this->_scopeConfig = $scopeConfig;
-        $this->_resourceConfig = $resourceConfig;
 
-        $this->_configCache = array();
+        $this->_objectManager = $objectManager;
     }
 
+
+    /**
+     * @return Glugox\Integration\Helper\Config
+     */
+    public function getConfigObject() {
+        return $this->_objectManager->get("Glugox\Integration\Helper\Config");
+    }
+
+
+    /**
+     * Returns proper importer instance (Glugox\Integration\Model\Integration\Import\ImporterInterface)
+     * based on the integration model (having data: integration_code, name, etc).
+     *
+     * @param type $integration
+     * @return type
+     */
+    public function getImporter($integration){
+        $className = 'Glugox\Integration\Model\Integration\Import\DefaultImporter';
+        return $this->_objectManager->create($className)->setIntegration($integration);
+    }
 
     /**
      * @return string
      */
     public function getMonitorUrl() {
-        if (!$this->_monitorUrl) {
-            $this->_monitorUrl = $this->getUrl("*/monitor");
-        }
-        return $this->_monitorUrl;
+        return $this->getConfigObject()->getMonitorUrl();
     }
 
 
@@ -108,10 +72,7 @@ class Data extends AbstractHelper {
      * @return string
      */
     public function getIntegrationAjaxUrl() {
-        if (!$this->_ajaxUrl) {
-            $this->_ajaxUrl = $this->getUrl("*/ajax");
-        }
-        return $this->_ajaxUrl;
+        return $this->getConfigObject()->getIntegrationAjaxUrl();
     }
 
 
@@ -141,41 +102,26 @@ class Data extends AbstractHelper {
     }
 
 
+
     /**
-     * Get config for this module.
-     * To get store specific config:
-     * getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-     *
-     * To avoid config reinitialization and stores reinitialization,
-     * we are just setting new config values to cache if we need to get it back
-     * in the same request.
      *
      * @param type $path
      * @return type
      */
     public function getConfig($path) {
-        if (isset($this->_configCache[$path])) {
-            return $this->_configCache[$path];
-        }
-        return $this->_scopeConfig->getValue('glugox/' . $path, 'default');
+        return $this->getConfigObject()->getConfig($path);
     }
 
 
+
     /**
-     * Set config for this module.
-     * To set store specific config:
-     * setValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-     *
-     * To avoid config reinitialization and stores reinitialization,
-     * we are just setting new config values to cache if we need to get it back
-     * in the same request.
      *
      * @param type $path
+     * @param type $value
      * @return type
      */
     public function setConfig($path, $value) {
-        $this->_configCache[$path] = $value;
-        $this->_resourceConfig->saveConfig('glugox/' . $path, $value, 'default', 0);
+        return $this->getConfigObject()->setConfig($path, $value);
     }
 
 
@@ -191,15 +137,6 @@ class Data extends AbstractHelper {
         return $this->_logger->info($message, $context);
     }
 
-
-    /**
-     * @param string $route
-     * @param array $params
-     * @return string
-     */
-    public function getUrl($route = '', $params = []) {
-        return $this->_backendUrl->getUrl($route, $params);
-    }
 
 
 }

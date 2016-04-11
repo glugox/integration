@@ -23,9 +23,8 @@ interface ImporterInterface {
     /**
      * Import external data from particular source
      *
-     * @param array $importData
      * @throws \Glugox\Integration\Exception\IntegrationException
      */
-    public function import(array $importData);
+    public function import();
 
 }

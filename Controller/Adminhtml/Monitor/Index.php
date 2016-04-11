@@ -26,7 +26,7 @@ class Index extends Integration {
     public function execute() {
 
 
-        $this->_manager->start();
+        //$this->_manager->start();
 
         if ($this->getRequest()->isXmlHttpRequest()) {
             $this->getResponse()->representJson(

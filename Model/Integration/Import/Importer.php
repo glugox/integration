@@ -17,6 +17,29 @@ namespace Glugox\Integration\Model\Integration\Import;
  */
 abstract class Importer implements \Glugox\Integration\Model\Integration\Import\ImporterInterface {
 
-    //
+    /** @var \Glugox\Integration\Helper\Data */
+    protected $_helper;
+
+    /** @var \Glugox\Integration\Model\Integration */
+    protected $_integration;
+
+    /**
+     *
+     * @param \Glugox\Integration\Model\Integration $integration
+     * @return \Glugox\Integration\Model\Integration\Import\Importer
+     */
+    public function setIntegration(\Glugox\Integration\Model\Integration $integration){
+        $this->_integration = $integration;
+        return $this;
+    }
+
+
+    /**
+     * @param \Glugox\Integration\Helper\Data $helper
+     */
+    public function __construct(\Glugox\Integration\Helper\Data $helper) {
+        $this->_helper = $helper;
+    }
+
 
 }

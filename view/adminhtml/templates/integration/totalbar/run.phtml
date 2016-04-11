@@ -22,7 +22,7 @@
                 class="action-primary"
                 id="g-integration-run-button"
                 onclick='glugoxIntegration.run("<?php echo $this->helper('Glugox\Integration\Helper\Data')->getIntegrationAjaxUrl() ?>");'
-                <?php echo $this->helper('Glugox\Integration\Helper\Data')->isDisabled() ? 'disabled="disabled"' : '' ?>
+                <?php echo $this->helper('Glugox\Integration\Helper\Data')->isDisabled() ? 'disabled' : '' ?>
                 title="Run">
                     <?php /* @escapeNotVerified */ echo __('Run') ?>
             </button>

@@ -16,8 +16,8 @@ namespace Glugox\Integration\Model;
  *
  * @method \string getName()
  * @method Integration setName(\string $name)
- * @method \string getCode()
- * @method Integration setCode(\string $name)
+ * @method \string getIntegrationCode()
+ * @method Integration setIntegrationCode(\string $name)
  * @method Integration setStatus(\int $value)
  * @method \string getCreatedAt()
  * @method Integration setCreatedAt(\string $createdAt)
@@ -35,6 +35,9 @@ class Integration extends \Magento\Framework\Model\AbstractModel {
 
     /*     * #@- */
 
+
+    /** @var \Glugox\Integration\Helper\Data */
+    protected $_helper;
 
     /*     * #@+
      * Integration data key constants.
@@ -56,12 +59,15 @@ class Integration extends \Magento\Framework\Model\AbstractModel {
      * @param array $data
      */
     public function __construct(
-    \Magento\Framework\Model\Context $context,
+            \Magento\Framework\Model\Context $context,
             \Magento\Framework\Registry $registry,
+            \Glugox\Integration\Helper\Data $helper,
             \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
             \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
             array $data = []
     ) {
+
+        $this->_helper = $helper;
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
     }
 
@@ -120,6 +126,15 @@ class Integration extends \Magento\Framework\Model\AbstractModel {
      */
     public function getStatus() {
         return (int) $this->getData(self::STATUS);
+    }
+
+
+    /**
+     *
+     * @return boolean
+     */
+    public function import(){
+        return $this->_helper->getImporter($this)->import();
     }
 
 
