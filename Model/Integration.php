@@ -26,14 +26,20 @@ namespace Glugox\Integration\Model;
  * @method \Glugox\Integration\Model\ResourceModel\Integration getResource()
  */
 class Integration extends \Magento\Framework\Model\AbstractModel {
-    /*     * #@+
+
+    /*
      * Integration Status values
      */
-
     const STATUS_INACTIVE = 0;
     const STATUS_ACTIVE = 1;
 
-    /*     * #@- */
+    /*
+     * Integration Enabled values
+     */
+    const STATUS_ENABLED = 1;
+    const STATUS_DISABLED = 0;
+
+    /*
 
 
     /** @var \Glugox\Integration\Helper\Data */

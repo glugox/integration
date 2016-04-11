@@ -41,5 +41,13 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
         $this->_helper = $helper;
     }
 
+    /**
+     *
+     * @return boolean
+     */
+    protected function validate(){
+        return true;
+    }
+
 
 }

@@ -104,7 +104,8 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
     protected function _addGeneralFieldset($form, $integrationData) {
         $fieldset = $form->addFieldset('base_fieldset', ['legend' => __('General')]);
 
-        $disabled = false;
+
+        $disabled = isset($integrationData[Main::DATA_STATUS]) &&  (int)$integrationData[Main::DATA_STATUS] == IntegrationModel::STATUS_ACTIVE;
         if (isset($integrationData[self::DATA_ID])) {
             $fieldset->addField(self::DATA_ID, 'hidden', ['name' => 'id']);
         }
@@ -143,10 +144,11 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
         $fieldset->addField(
                 self::DATA_ENABLED, 'select', [
             'name' => self::DATA_ENABLED,
+            'disabled' => $disabled,
             'label' => __('Enabled'),
             'options' => [
-                \Glugox\Integration\Model\Integration::STATUS_INACTIVE => __('No'),
-                \Glugox\Integration\Model\Integration::STATUS_ACTIVE => __('Yes'),
+                \Glugox\Integration\Model\Integration::STATUS_DISABLED => __('Disabled'),
+                \Glugox\Integration\Model\Integration::STATUS_ENABLED => __('Enabled'),
             ]
                 ]
         );

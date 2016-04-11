@@ -21,6 +21,13 @@ class Data extends AbstractHelper {
 
 
     /**
+     * Core registry
+     *
+     * @var \Magento\Framework\Registry
+     */
+    protected $_registry = null;
+
+    /**
      * @var \Magento\Framework\ObjectManagerInterface
      */
     protected $_objectManager;
@@ -32,11 +39,13 @@ class Data extends AbstractHelper {
      */
     public function __construct(
             \Magento\Framework\App\Helper\Context $context,
-            \Magento\Framework\ObjectManagerInterface $objectManager
+            \Magento\Framework\ObjectManagerInterface $objectManager,
+            \Magento\Framework\Registry $registry
     ) {
         parent::__construct($context);
 
         $this->_objectManager = $objectManager;
+        $this->_registry = $registry;
     }
 
 
@@ -113,6 +122,15 @@ class Data extends AbstractHelper {
     }
 
 
+    /**
+     * @param string $route
+     * @param array $params
+     * @return string
+     */
+    public function getUrl($route = '', $params = []) {
+        return $this->getConfigObject()->getUrl($route, $params);
+    }
+
 
     /**
      *
@@ -134,6 +152,12 @@ class Data extends AbstractHelper {
         if (!is_string($message)) {
             $message = '<pre>' . print_r($message, true) . '</pre>';
         }
+
+        // if we are running command, we have set the command output interface in the registry from that command
+        if(null !== ($this->_registry->registry(\Glugox\Integration\Event\Manager::CURRENT_CMD_OUTPUT_INTERFACE))){
+            $this->_registry->registry(\Glugox\Integration\Event\Manager::CURRENT_CMD_OUTPUT_INTERFACE)->writeln('<info>'.$message.'</info>');
+        }
+
         return $this->_logger->info($message, $context);
     }
 

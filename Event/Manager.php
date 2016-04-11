@@ -11,7 +11,12 @@
 
 namespace Glugox\Integration\Event;
 
+use \Glugox\Integration\Model\Integration;
+
 class Manager implements ManagerInterface {
+
+    /** @var string */
+    const CURRENT_CMD_OUTPUT_INTERFACE = 'currcmd_output_interface';
 
     /** @var \Glugox\Integration\Helper\Data */
     protected $_helper;
@@ -51,9 +56,9 @@ class Manager implements ManagerInterface {
 
         // load all integrations from the database
         $integrations = $this->_service->getAllIntegrations();
-        $this->_helper->info("Loaded " . \count($integrations) . ' Integrations!');
+        $this->_helper->info("Loaded " . \count($integrations) . ' Integrations:');
         foreach ($integrations as $integration) {
-            $this->_helper->info($integration->getIntegrationCode());
+            $this->_helper->info(" - " . $integration->getIntegrationCode());
             $this->_allIntegrations[] = $integration;
         }
     }
@@ -65,7 +70,6 @@ class Manager implements ManagerInterface {
      * @return array
      */
     public function run() {
-        $this->_helper->info("Run");
         $this->start();
         return $this->_result;
     }
@@ -75,7 +79,6 @@ class Manager implements ManagerInterface {
      * Starts the processes
      */
     public function start() {
-        $this->_helper->info("Start");
         $this->_init();
         $result = $this->runNextImporter();
         while(true === $result){
@@ -88,8 +91,6 @@ class Manager implements ManagerInterface {
      * Initializes the integration
      */
     private function _init() {
-        $this->_helper->info("Init");
-
         // init data
         $this->_result = array(
             'error' => '',
@@ -103,21 +104,44 @@ class Manager implements ManagerInterface {
 
 
     /**
+     * Returns the next integration from the queue
+     *
+     * @return  \Glugox\Integration\Model\Integration|null
+     */
+    private function _getNextIntegration($checkAvailability=true){
+        /** @var \Glugox\Integration\Model\Integration **/
+        $integration = isset($this->_allIntegrations[$this->_currentIntegrationIndex]) ? $this->_allIntegrations[$this->_currentIntegrationIndex] : null;
+        ++$this->_currentIntegrationIndex;
+
+        if($integration && $checkAvailability){
+            $availability = (int)$integration->getEnabled();
+
+            // if integration is not enabled, loop untill we find enabled one,
+            // or untill we get out of integrations
+            while(Integration::STATUS_ENABLED !== $availability && $integration){
+                $integration = isset($this->_allIntegrations[$this->_currentIntegrationIndex]) ? $this->_allIntegrations[$this->_currentIntegrationIndex] : null;
+                ++$this->_currentIntegrationIndex;
+            }
+        }
+
+        return $integration;
+    }
+
+
+    /**
      * Runs the next importer in the queue
      *
      * @return boolean
      */
     protected function runNextImporter(){
 
-        $this->_helper->info("Running the next importer...");
-
-        /** @var \Glugox\Integration\Model\Integration **/
-        $integration = isset($this->_allIntegrations[$this->_currentIntegrationIndex]) ? $this->_allIntegrations[$this->_currentIntegrationIndex] : null;
-        ++$this->_currentIntegrationIndex;
-        if(!$integration){
+        // check completion
+        if(!$integration = $this->_getNextIntegration()){
             $this->finishAll();
             return false;
         }
+
+        $this->_helper->info("Running the next available importer...");
         $this->_helper->setConfig('integration_activity/current', $integration->getIntegrationCode());
         return $integration->import();
     }

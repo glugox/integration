@@ -92,11 +92,7 @@ class Security extends \Magento\Backend\Block\Widget\Form\Generic implements \Ma
      */
     protected function _addSecurityFieldset($form, $integrationData) {
         $fieldset = $form->addFieldset('security_fieldset', ['legend' => __('Security')]);
-
-        $disabled = false;
-
-
-
+        $disabled = isset($integrationData[Main::DATA_STATUS]) &&  (int)$integrationData[Main::DATA_STATUS] == IntegrationModel::STATUS_ACTIVE;
 
         $fieldset->addField(
                 Main::DATA_CA_FILE, 'text', [
@@ -142,7 +138,7 @@ class Security extends \Magento\Backend\Block\Widget\Form\Generic implements \Ma
                 ]
         );
 
-        
+
     }
 
 

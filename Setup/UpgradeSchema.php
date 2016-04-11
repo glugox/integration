@@ -184,6 +184,55 @@ class UpgradeSchema implements UpgradeSchemaInterface {
         $installer->getConnection()->createTable($table);
 
 
+
+        /**
+         * Create table 'newsletter_problem'
+         */
+        $table = $installer->getConnection()
+            ->newTable($installer->getTable('glugox_integration_problem'))
+            ->addColumn(
+                'problem_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['identity' => true, 'unsigned' => true, 'nullable' => false, 'primary' => true],
+                'Problem Id'
+            )
+            ->addColumn(
+                'integration_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['unsigned' => true, 'nullable' => false, 'default' => '0'],
+                'Integration Id'
+            )
+            ->addColumn(
+                'problem_error_code',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['unsigned' => true, 'default' => '0'],
+                'Problem Error Code'
+            )
+            ->addColumn(
+                'problem_error_text',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                200,
+                [],
+                'Problem Error Text'
+            )
+            ->addIndex(
+                $installer->getIdxName('glugox_integration_problem', ['integration_id']),
+                ['integration_id']
+            )
+            ->addForeignKey(
+                $installer->getFkName('glugox_integration_problem', 'integration_id', 'glugox_integration', 'integration_id'),
+                'integration_id',
+                $installer->getTable('glugox_integration'),
+                'integration_id',
+                \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
+            )
+            ->setComment('Integration Problems');
+        $installer->getConnection()->createTable($table);
+
+
         $installer->endSetup();
     }
 

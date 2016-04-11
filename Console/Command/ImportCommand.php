@@ -44,6 +44,29 @@ class ImportCommand extends Command {
     const IMPORT_ALL_CODE = 'all';
 
     /**
+     * Core registry
+     *
+     * @var \Magento\Framework\Registry
+     */
+    protected $_registry = null;
+
+    /**
+     * Manager
+     */
+    private $_manager;
+
+
+    /**
+     * @param \Glugox\Integration\Event\Manager $manager
+     */
+    public function __construct(\Glugox\Integration\Event\Manager $manager, \Magento\Framework\Registry $registry)
+    {
+        $this->_manager = $manager;
+        $this->_registry = $registry;
+        parent::__construct();
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function configure() {
@@ -76,6 +99,8 @@ class ImportCommand extends Command {
             $mode = self::STRICT_MODE;
         }
         $output->writeln('<info>Starting import: ' . $code . ' in ' . $mode . '...</info>');
+        $this->_registry->register(\Glugox\Integration\Event\Manager::CURRENT_CMD_OUTPUT_INTERFACE, $output);
+        $this->_manager->run();
     }
 
 
