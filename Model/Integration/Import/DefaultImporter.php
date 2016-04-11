@@ -23,6 +23,7 @@ class DefaultImporter extends Importer {
      */
     public function import() {
         $this->_helper->info("Importing (".$this->_integration->getIntegrationCode().")...");
+        return true;
     }
 
 }

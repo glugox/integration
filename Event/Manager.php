@@ -78,6 +78,9 @@ class Manager implements ManagerInterface {
         $this->_helper->info("Start");
         $this->_init();
         $result = $this->runNextImporter();
+        while(true === $result){
+            $result = $this->runNextImporter();
+        }
     }
 
 
@@ -124,6 +127,7 @@ class Manager implements ManagerInterface {
      * Method to complete the importer cycle.
      */
     protected function finishAll(){
+        $this->_helper->setConfig('integration_activity/current', null);
         $this->_helper->info("Integration completed!");
     }
 
@@ -134,7 +138,7 @@ class Manager implements ManagerInterface {
      * @return type
      */
     public function isRunning() {
-        return (int)$this->_helper->getConfig('integration_activity/current') !== 0;
+        return !empty($this->_helper->getConfig('integration_activity/current'));
     }
 
 
