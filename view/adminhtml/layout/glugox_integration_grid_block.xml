@@ -40,7 +40,7 @@
                     </block>
                     <block class="Magento\Backend\Block\Widget\Grid\Column" as="availability">
                         <arguments>
-                            <argument name="header" xsi:type="string" translate="true">Eneabled</argument>
+                            <argument name="header" xsi:type="string" translate="true">Enabled</argument>
                             <argument name="type" xsi:type="string">options</argument>
                             <argument name="options" xsi:type="options" model="Glugox\Integration\Model\Integration\Source\Enabled"/>
                             <argument name="index" xsi:type="string">enabled</argument>
