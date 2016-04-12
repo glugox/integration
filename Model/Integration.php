@@ -15,14 +15,25 @@ namespace Glugox\Integration\Model;
  * Integration model.
  *
  * @method \string getName()
- * @method Integration setName(\string $name)
+ * @method \Glugox\Integration\Model\Integration setName(\string $name)
  * @method \string getIntegrationCode()
- * @method Integration setIntegrationCode(\string $name)
- * @method Integration setStatus(\int $value)
+ * @method \Glugox\Integration\Model\Integration setIntegrationCode(\string $name)
+ * @method \Glugox\Integration\Model\Integration setStatus(\int $value)
+ * @method \string getCaFile()
+ * @method \Glugox\Integration\Model\Integration setCaFile(\string $value)
+ * @method \string getClientFile()
+ * @method \Glugox\Integration\Model\Integration setClientFile(\string $value)
+ * @method \string getKeyFile()
+ * @method \Glugox\Integration\Model\Integration setCertPass(\string $value)
+ * @method \string getCertPass()
+ * @method \Glugox\Integration\Model\Integration setKeyFile(\string $value)
  * @method \string getCreatedAt()
- * @method Integration setCreatedAt(\string $createdAt)
+ * @method \Glugox\Integration\Model\Integration setCreatedAt(\string $createdAt)
  * @method \string getUpdatedAt()
- * @method Integration setUpdatedAt(\string $createdAt)
+ * @method \Glugox\Integration\Model\Integration setUpdatedAt(\string $createdAt)
+ * @method \string getImporterClass()
+ * @method \Glugox\Integration\Model\Integration setImporterClass(\string $value)
+ * @method \string getServiceUrl()
  * @method \Glugox\Integration\Model\ResourceModel\Integration getResource()
  */
 class Integration extends \Magento\Framework\Model\AbstractModel {
@@ -137,7 +148,7 @@ class Integration extends \Magento\Framework\Model\AbstractModel {
 
     /**
      *
-     * @return boolean
+     * @return \Glugox\Integration\Model\ImportResult
      */
     public function import(){
         return $this->_helper->getImporter($this)->import();

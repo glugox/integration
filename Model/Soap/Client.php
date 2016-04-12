@@ -16,6 +16,7 @@ namespace Glugox\Integration\Model\Soap;
  *
  * @author Eko
  */
-class Client extends SoapClient {
-    //put your code here
+class Client extends \SoapClient {
+
+    
 }

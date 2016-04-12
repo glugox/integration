@@ -61,11 +61,24 @@ class Data extends AbstractHelper {
      * Returns proper importer instance (Glugox\Integration\Model\Integration\Import\ImporterInterface)
      * based on the integration model (having data: integration_code, name, etc).
      *
-     * @param type $integration
+     * @param \Glugox\Integration\Model\Integration $integration
      * @return type
      */
-    public function getImporter($integration){
+    public function getImporter(\Glugox\Integration\Model\Integration $integration){
         $className = 'Glugox\Integration\Model\Integration\Import\DefaultImporter';
+        $importerClass = $integration->getImporterClass();
+        if(!empty($importerClass)){
+            $className = $importerClass;
+        }else{
+
+            /**
+             * If we did not set the importer file, we will assume it is ImporterWithCert importer class if there
+             * are all requiret cert parameters set.
+             */
+            if( !empty($integration->getCaFile()) && !empty($integration->getClientFile()) && !empty($integration->getKeyFile()) ){
+                $className = $this->getConfigObject()->getImporterWithCertClass();
+            }
+        }
         return $this->_objectManager->create($className)->setIntegration($integration);
     }
 
@@ -149,6 +162,9 @@ class Data extends AbstractHelper {
      * @return string
      */
     public function info($message, array $context = array()) {
+        if(empty($message)){
+            return false;
+        }
         if (!is_string($message)) {
             $message = '<pre>' . print_r($message, true) . '</pre>';
         }

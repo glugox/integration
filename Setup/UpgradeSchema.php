@@ -186,16 +186,16 @@ class UpgradeSchema implements UpgradeSchemaInterface {
 
 
         /**
-         * Create table 'newsletter_problem'
+         * Create table 'glugox_integration_log'
          */
         $table = $installer->getConnection()
-            ->newTable($installer->getTable('glugox_integration_problem'))
+            ->newTable($installer->getTable('glugox_integration_log'))
             ->addColumn(
-                'problem_id',
+                'log_id',
                 \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
                 null,
                 ['identity' => true, 'unsigned' => true, 'nullable' => false, 'primary' => true],
-                'Problem Id'
+                'Log Id'
             )
             ->addColumn(
                 'integration_id',
@@ -205,31 +205,45 @@ class UpgradeSchema implements UpgradeSchemaInterface {
                 'Integration Id'
             )
             ->addColumn(
-                'problem_error_code',
+                'log_code',
                 \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
                 null,
                 ['unsigned' => true, 'default' => '0'],
-                'Problem Error Code'
+                'Log Code'
             )
             ->addColumn(
-                'problem_error_text',
+                'started_at',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                null,
+                ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT],
+                'Start Time'
+            )
+            ->addColumn(
+                'finished_at',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                null,
+                ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT],
+                'Finish Time'
+            )
+            ->addColumn(
+                'log_text',
                 \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
-                200,
+                null,
                 [],
-                'Problem Error Text'
+                'Log Text'
             )
             ->addIndex(
-                $installer->getIdxName('glugox_integration_problem', ['integration_id']),
+                $installer->getIdxName('glugox_integration_log', ['integration_id']),
                 ['integration_id']
             )
             ->addForeignKey(
-                $installer->getFkName('glugox_integration_problem', 'integration_id', 'glugox_integration', 'integration_id'),
+                $installer->getFkName('glugox_integration_log', 'integration_id', 'glugox_integration', 'integration_id'),
                 'integration_id',
                 $installer->getTable('glugox_integration'),
                 'integration_id',
                 \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
             )
-            ->setComment('Integration Problems');
+            ->setComment('Integration Log');
         $installer->getConnection()->createTable($table);
 
 

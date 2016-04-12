@@ -27,8 +27,9 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
     const DATA_INTEGRATION_CODE = 'integration_code';
     const DATA_NAME = 'name';
     const DATA_STATUS = 'status';
-    const DATA_ENABLED = 'enebled';
+    const DATA_ENABLED = 'enabled';
     const DATA_SERVICE_URL = 'service_url';
+    const DATA_IMPORTER_CLASS = 'importer_class';
 
     const DATA_CA_FILE = 'ca_file';
     const DATA_CLIENT_FILE = 'client_file';
@@ -134,9 +135,22 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
                 self::DATA_SERVICE_URL, 'text', [
             'label' => __('Service URL'),
             'name' => self::DATA_SERVICE_URL,
+            'required' => true,
             'disabled' => $disabled,
             'note' => __(
                     'Main service URL'
+            )
+                ]
+        );
+
+        $fieldset->addField(
+                self::DATA_IMPORTER_CLASS, 'text', [
+            'label' => __('Importer Class'),
+            'name' => self::DATA_IMPORTER_CLASS,
+            'disabled' => $disabled,
+            'maxlength' => '255',
+            'note' => __(
+                    'Class that extends abstract class Glugox\Integration\Model\Integration\Import\Importer, and can be used for custom imports.'
             )
                 ]
         );

@@ -158,4 +158,12 @@ class Config extends AbstractHelper {
     }
 
 
+    /**
+     * @return string
+     */
+    public function getImporterWithCertClass(){
+        return '\Glugox\Integration\Model\Integration\Import\ImporterWithCert';
+    }
+
+
 }

@@ -81,7 +81,7 @@ class Manager implements ManagerInterface {
     public function start() {
         $this->_init();
         $result = $this->runNextImporter();
-        while(true === $result){
+        while(false !== $result/* && true === $result->isSuccess()*/){
             $result = $this->runNextImporter();
         }
     }
@@ -131,7 +131,7 @@ class Manager implements ManagerInterface {
     /**
      * Runs the next importer in the queue
      *
-     * @return boolean
+     * @return \Glugox\Integration\Model\ImportResult
      */
     protected function runNextImporter(){
 
@@ -143,6 +143,7 @@ class Manager implements ManagerInterface {
 
         $this->_helper->info("Running the next available importer...");
         $this->_helper->setConfig('integration_activity/current', $integration->getIntegrationCode());
+
         return $integration->import();
     }
 
@@ -173,6 +174,9 @@ class Manager implements ManagerInterface {
     public function isDisabled() {
         return $this->isRunning();
     }
+
+
+
 
 
 }
