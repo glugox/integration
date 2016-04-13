@@ -23,6 +23,12 @@ use Glugox\Integration\Exception\IntegrationException;
  */
 class IntegrationService implements IntegrationServiceInterface {
 
+
+    /**
+     * When integrations resets, these tables are being reseted/truncated
+     */
+    const TRUNCATEABLE_TABLES = ["glugox_import_products"];
+
     /**
      * @var IntegrationFactory
      */
@@ -127,6 +133,30 @@ class IntegrationService implements IntegrationServiceInterface {
     public function getAllIntegrationRows() {
         $integrations = $this->_integrationFactory->create()->getAllIntegrations();
         return $integrations;
+    }
+
+    /**
+     * @return array
+     */
+    public function resetAllIntegrations() {
+        $integrations = $this->_integrationFactory->create()->resetAllIntegrations();
+        return $integrations;
+    }
+
+    /**
+     * @return type
+     */
+    public function cleanHelperTables() {
+        return $this->_integrationFactory->create()->cleanHelperTables();
+    }
+
+    /**
+     * Returns number of records in the helper import ptoducts table
+     * 
+     * @return int
+     */
+    public function getNumImportProductsLeft() {
+        return $this->_integrationFactory->create()->getNumImportProductsLeft();
     }
 
 

@@ -12,6 +12,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\StringInput;
 
 /**
  * Class GreetingCommand
@@ -88,6 +90,8 @@ class ImportCommand extends Command {
      * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output) {
+
+
         $code = $input->getArgument(self::CODE_ARGUMENT);
         $force = $input->getOption(self::FORCE);
         $mode = self::DEFAULT_MODE;
@@ -98,9 +102,13 @@ class ImportCommand extends Command {
         if ($force) {
             $mode = self::STRICT_MODE;
         }
-        $output->writeln('<info>Starting import: ' . $code . ' in ' . $mode . '...</info>');
+        $output->writeln('<info>'.  $input->getOption(self::FORCE).' Starting import: ' . $code . ' in ' . $mode . '...</info>');
+
+        // Register the console output to the global registry, so it can be used from other parts to display console info too.
         $this->_registry->register(\Glugox\Integration\Event\Manager::CURRENT_CMD_OUTPUT_INTERFACE, $output);
-        $this->_manager->run();
+
+        // Run the integration manager
+        $this->_manager->run((string)$input, $this->getDefinition());
     }
 
 

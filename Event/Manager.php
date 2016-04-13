@@ -11,7 +11,9 @@
 
 namespace Glugox\Integration\Event;
 
-use \Glugox\Integration\Model\Integration;
+use Glugox\Integration\Model\Integration;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Input\InputDefinition;
 
 class Manager implements ManagerInterface {
 
@@ -23,6 +25,9 @@ class Manager implements ManagerInterface {
 
     /** @var \Glugox\Integration\Api\IntegrationServiceInterface */
     protected $_service;
+
+    /** @var \Symfony\Component\Console\Input\StringInput */
+    protected $_input;
 
     /** @var array */
     protected $_result;
@@ -45,11 +50,14 @@ class Manager implements ManagerInterface {
 
 
     /**
-     * Loads all integrations that we have.
+     * Loads all integrations that we have and prepares them for imports.
+     *
+     * @param boolean $starting Marker if we are actually staring the integration, so throw error if there are running ones.
      */
-    private function _loadIntegrations() {
+    private function _prepareIntegrations($starting = true) {
 
         $this->_helper->info("Loading Integrations...");
+        $hasIntegrationRunning = false;
 
         // make sure the array is empty
         $this->_allIntegrations = array();
@@ -60,16 +68,44 @@ class Manager implements ManagerInterface {
         foreach ($integrations as $integration) {
             $this->_helper->info(" - " . $integration->getIntegrationCode());
             $this->_allIntegrations[] = $integration;
+            $hasIntegrationRunning = $hasIntegrationRunning || (Integration::STATUS_ACTIVE === (int) $integration->getStatus());
         }
+
+        $isForce = $this->_input->getOption(\Glugox\Integration\Console\Command\ImportCommand::FORCE);
+        $numImportProductsLeft = $this->_service->getNumImportProductsLeft();
+
+        if ($starting && !$isForce) {
+            if ($hasIntegrationRunning) {
+                throw new \Glugox\Integration\Exception\IntegrationException(__('One of the integrations is already running, use -f to force the run!'));
+            }
+            if ($numImportProductsLeft) {
+                throw new \Glugox\Integration\Exception\IntegrationException(__('Helper tables are not empty ('.$numImportProductsLeft.'), meaning last import not finished well/yet, use -f to force the run!'));
+            }
+        }
+
+        $this->resetAllIntegrations();
+    }
+
+
+    /**
+     * Resets all integrations
+     */
+    public function resetAllIntegrations() {
+
+        // reset db tables
+        $reset = $this->_service->resetAllIntegrations();
+        $reset = $this->_service->cleanHelperTables();
     }
 
 
     /**
      * Run the integration
      *
+     * @param string $input Command input
      * @return array
      */
-    public function run() {
+    public function run($strInput = "", InputDefinition $definition = null) {
+        $this->_input = new StringInput($strInput, $definition);
         $this->start();
         return $this->_result;
     }
@@ -81,7 +117,7 @@ class Manager implements ManagerInterface {
     public function start() {
         $this->_init();
         $result = $this->runNextImporter();
-        while(false !== $result/* && true === $result->isSuccess()*/){
+        while (false !== $result) {
             $result = $this->runNextImporter();
         }
     }
@@ -97,7 +133,7 @@ class Manager implements ManagerInterface {
             'current' => 0
         );
         $this->_currentIntegrationIndex = 0;
-        $this->_loadIntegrations();
+        $this->_prepareIntegrations();
 
         //$this->_result['current'] = $this->_helper->getConfig('integration_activity/current');
     }
@@ -108,17 +144,17 @@ class Manager implements ManagerInterface {
      *
      * @return  \Glugox\Integration\Model\Integration|null
      */
-    private function _getNextIntegration($checkAvailability=true){
-        /** @var \Glugox\Integration\Model\Integration **/
+    private function _getNextIntegration($checkAvailability = true) {
+        /** @var \Glugox\Integration\Model\Integration * */
         $integration = isset($this->_allIntegrations[$this->_currentIntegrationIndex]) ? $this->_allIntegrations[$this->_currentIntegrationIndex] : null;
         ++$this->_currentIntegrationIndex;
 
-        if($integration && $checkAvailability){
-            $availability = (int)$integration->getEnabled();
+        if ($integration && $checkAvailability) {
+            $availability = (int) $integration->getEnabled();
 
             // if integration is not enabled, loop untill we find enabled one,
             // or untill we get out of integrations
-            while(Integration::STATUS_ENABLED !== $availability && $integration){
+            while (Integration::STATUS_ENABLED !== $availability && $integration) {
                 $integration = isset($this->_allIntegrations[$this->_currentIntegrationIndex]) ? $this->_allIntegrations[$this->_currentIntegrationIndex] : null;
                 ++$this->_currentIntegrationIndex;
             }
@@ -133,10 +169,10 @@ class Manager implements ManagerInterface {
      *
      * @return \Glugox\Integration\Model\ImportResult
      */
-    protected function runNextImporter(){
+    protected function runNextImporter() {
 
         // check completion
-        if(!$integration = $this->_getNextIntegration()){
+        if (!$integration = $this->_getNextIntegration()) {
             $this->finishAll();
             return false;
         }
@@ -151,7 +187,7 @@ class Manager implements ManagerInterface {
     /**
      * Method to complete the importer cycle.
      */
-    protected function finishAll(){
+    protected function finishAll() {
         $this->_helper->setConfig('integration_activity/current', null);
         $this->_helper->info("Integration completed!");
     }
@@ -174,9 +210,6 @@ class Manager implements ManagerInterface {
     public function isDisabled() {
         return $this->isRunning();
     }
-
-
-
 
 
 }

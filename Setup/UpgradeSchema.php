@@ -166,7 +166,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
                 ['sku'],
                 \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
             ),
-            ['name'],
+            ['sku'],
             ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
         )->addForeignKey(
                 $installer->getFkName(

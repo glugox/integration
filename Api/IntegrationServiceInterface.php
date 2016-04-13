@@ -68,6 +68,21 @@ interface IntegrationServiceInterface {
     public function getAllIntegrationRows();
 
     /**
+     * Resets all Integrations.
+     */
+    public function resetAllIntegrations();
+
+    /**
+     * Cleans all helper tables.
+     */
+    public function cleanHelperTables();
+
+    /**
+     * Returns number of records in the helper import ptoducts table
+     */
+    public function getNumImportProductsLeft();
+
+    /**
      * Update an Integration.
      *
      * @param array $integrationData

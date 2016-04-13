@@ -134,6 +134,29 @@ class Integration extends \Magento\Framework\Model\AbstractModel {
         return $integrations;
     }
 
+    /**
+     * Resets all integrations.
+     *
+     * @return array
+     */
+    public function resetAllIntegrations() {
+        $integrations = $this->getResource()->resetAllIntegrations();
+        return $integrations;
+    }
+
+    /**
+     * Cleans all integration helper tables.
+     */
+    public function cleanHelperTables() {
+        return $this->getResource()->cleanHelperTables();
+    }
+
+    /**
+     * Returns number of records in the helper import ptoducts table.
+     */
+    public function getNumImportProductsLeft() {
+        return $this->getResource()->getNumImportProductsLeft();
+    }
 
     /**
      * Get integration status.
