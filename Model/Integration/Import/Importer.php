@@ -10,6 +10,8 @@
  */
 namespace Glugox\Integration\Model\Integration\Import;
 
+use Magento\Framework\App\Filesystem\DirectoryList;
+
 /**
  * Description of Importer
  *
@@ -24,6 +26,16 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
     const IMPORTER_STATUS_VALIDATION  = 111;
     const IMPORTER_STATUS_ERROR       = 501;
     const IMPORTER_STATUS_SUCCESS     = 901;
+
+    /**
+     * @var \Magento\Framework\Filesystem
+     */
+    protected $_filesystem;
+
+    /**
+     * @var \Glugox\Integration\Model\Integration\Import\ProductFactory
+     */
+    protected $_importProductFactory;
 
     /** @var \Glugox\Integration\Helper\Data */
     protected $_helper;
@@ -96,12 +108,16 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
     public function __construct(
             \Glugox\Integration\Helper\Data $helper,
             \Glugox\Integration\Model\Integration\LogFactory $logFactory,
-            \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
+            \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
+            \Magento\Framework\Filesystem $filesystem,
+            \Glugox\Integration\Model\Integration\Import\ProductFactory $importProductFactory
             ) {
         $this->_helper = $helper;
         $this->_result = new \Glugox\Integration\Model\ImportResult;
         $this->_logFactory = $logFactory;
         $this->_timezone = $timezone;
+        $this->_filesystem = $filesystem;
+        $this->_importProductFactory = $importProductFactory;
     }
 
     /**
@@ -157,6 +173,96 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
     protected function _import() {
         $serviceUrl = $this->_integration->getServiceUrl();
         $this->_info("Data loading: ".$serviceUrl."...");
+
+        $xml = $this->_loadCurl($serviceUrl);
+        $this->_importXML($xml);
+    }
+
+
+    /**
+     * Builds cURL handle or data loaded if param $exec is TRUE
+     *
+     * @param type $serviceUrl
+     * @param type $exec
+     * @return resource|string
+     */
+    protected function _buildCurl( $serviceUrl = null, $exec = false ){
+
+        $ch = curl_init();
+        if($serviceUrl){
+            curl_setopt($ch, CURLOPT_URL, $serviceUrl);
+        }
+        curl_setopt($ch, CURLOPT_VERBOSE, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_SSLVERSION, 3);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 900);
+
+        if($exec){
+            $xmlString = curl_exec($ch);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            return !$error ? $xmlString : $error;
+        }else{
+            return $ch;
+        }
+
+    }
+
+    /**
+     * Loads url
+     *
+     * @param type $serviceUrl
+     * @return string
+     */
+    protected function _loadCurl( $serviceUrl = null ){
+        return $this->_buildCurl($serviceUrl, true);
+    }
+
+        /**
+     * Imports xml string of products to a helper products table.
+     *
+     * @param strinf $xml
+     */
+    protected function _importXML($xmlString){
+        // write the xml to disc
+            $filename = "glugox/integration/import/" . $this->_integration->getIntegrationCode() . "-" . strftime('%Y-%m-%d_%H.%M.%S', $this->_timezone->scopeTimeStamp()) . ".xml";
+            $this->_filesystem->getDirectoryWrite(DirectoryList::VAR_DIR)->writeFile($filename, $xmlString);
+
+            try {
+                $xml = simplexml_load_string($xmlString);
+            } catch (Exception $ex) {
+                $this->_info($ex->getMessage(), true);
+            }
+
+            if ($xml) {
+
+                /**
+                 * Insert data from xml into the helper tmp table 'glugox_import_products'
+                 */
+                $importProduct = $this->_importProductFactory->create();
+                $xmlProducts = $xml->Table;
+                $this->_info("Inserting products into helper table...");
+                foreach ($xmlProducts as $xmlProduct) {
+                    $productName = (string) $xmlProduct->ProductName;
+
+                    $importProduct->unsetData();
+                    $importProduct->setData([
+                        "importer_code"  => (string) $this->_integration->getIntegrationCode(),
+                        "sku"            => (string) $xmlProduct->ProductCode,
+                        "category"       => (string) $xmlProduct->ProductType,
+                        "name"           => (string) $xmlProduct->ProductName,
+                        "warranty"       => (string) $xmlProduct->Warranty,
+                        "brend"          => (string) $xmlProduct->Brand,
+                        "description"    => (string) $xmlProduct->MarketingDescription,
+                        "image_url"      => (string) $xmlProduct->ProductImageUrl,
+                        "time_changed"   => (string) $xmlProduct->ChangeDateTime
+                    ]);
+
+                    $importProduct->save();
+                    $this->_info(".");
+                }
+            }
     }
 
     /**
@@ -190,6 +296,9 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
             $msg = "ERROR: " . $msg;
         }
         $this->_helper->info($msg);
+        if ("." === $msg) {
+            return null;
+        }
         $this->_result->addMessage($msg, $isError);
     }
 

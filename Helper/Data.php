@@ -19,7 +19,6 @@ use Glugox\Integration\Model\Integration\Import\Importer;
  */
 class Data extends AbstractHelper {
 
-
     /**
      * Core registry
      *
@@ -38,7 +37,7 @@ class Data extends AbstractHelper {
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      */
     public function __construct(
-            \Magento\Framework\App\Helper\Context $context,
+    \Magento\Framework\App\Helper\Context $context,
             \Magento\Framework\ObjectManagerInterface $objectManager,
             \Magento\Framework\Registry $registry
     ) {
@@ -64,23 +63,24 @@ class Data extends AbstractHelper {
      * @param \Glugox\Integration\Model\Integration $integration
      * @return type
      */
-    public function getImporter(\Glugox\Integration\Model\Integration $integration){
+    public function getImporter(\Glugox\Integration\Model\Integration $integration) {
         $className = 'Glugox\Integration\Model\Integration\Import\DefaultImporter';
         $importerClass = $integration->getImporterClass();
-        if(!empty($importerClass)){
+        if (!empty($importerClass)) {
             $className = $importerClass;
-        }else{
+        } else {
 
             /**
              * If we did not set the importer file, we will assume it is ImporterWithCert importer class if there
              * are all requiret cert parameters set.
              */
-            if( !empty($integration->getCaFile()) && !empty($integration->getClientFile()) && !empty($integration->getKeyFile()) ){
+            if (!empty($integration->getCaFile()) && !empty($integration->getClientFile()) && !empty($integration->getKeyFile())) {
                 $className = $this->getConfigObject()->getImporterWithCertClass();
             }
         }
         return $this->_objectManager->create($className)->setIntegration($integration);
     }
+
 
     /**
      * @return string
@@ -124,7 +124,6 @@ class Data extends AbstractHelper {
     }
 
 
-
     /**
      *
      * @param type $path
@@ -159,10 +158,12 @@ class Data extends AbstractHelper {
     /**
      * @param string $route
      * @param array $params
-     * @return string
+     * @return null
      */
     public function info($message, array $context = array()) {
-        if(empty($message)){
+
+        $output = null;
+        if (empty($message)) {
             return false;
         }
         if (!is_string($message)) {
@@ -170,13 +171,19 @@ class Data extends AbstractHelper {
         }
 
         // if we are running command, we have set the command output interface in the registry from that command
-        if(null !== ($this->_registry->registry(\Glugox\Integration\Event\Manager::CURRENT_CMD_OUTPUT_INTERFACE))){
-            $this->_registry->registry(\Glugox\Integration\Event\Manager::CURRENT_CMD_OUTPUT_INTERFACE)->writeln('<info>'.$message.'</info>');
+        if (null !== ($this->_registry->registry(\Glugox\Integration\Event\Manager::CURRENT_CMD_OUTPUT_INTERFACE))) {
+            $output = $this->_registry->registry(\Glugox\Integration\Event\Manager::CURRENT_CMD_OUTPUT_INTERFACE);
+            if ("." === $message) {
+                $output->write('.');
+                return null;
+            }
+            $output->writeln('<info>' . $message . '</info>');
         }
+
+
 
         return $this->_logger->info($message, $context);
     }
-
 
 
 }

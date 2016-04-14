@@ -26,6 +26,7 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
     const DATA_ID = 'integration_id';
     const DATA_INTEGRATION_CODE = 'integration_code';
     const DATA_NAME = 'name';
+    const SKU_PREFIX = 'sku_prefix';
     const DATA_STATUS = 'status';
     const DATA_ENABLED = 'enabled';
     const DATA_SERVICE_URL = 'service_url';
@@ -128,6 +129,16 @@ class Main extends \Magento\Backend\Block\Widget\Form\Generic implements \Magent
             'required' => true,
             'disabled' => $disabled,
             'maxlength' => '255'
+                ]
+        );
+
+        $fieldset->addField(
+                self::SKU_PREFIX, 'text', [
+            'label' => __('SKU Prefix'),
+            'name' => self::SKU_PREFIX,
+            'required' => false,
+            'disabled' => $disabled,
+            'maxlength' => '10'
                 ]
         );
 
