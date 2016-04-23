@@ -159,7 +159,7 @@ class ImportResult extends \Magento\Framework\DataObject {
             $this->setData("createdProducts", $this->createdProducts);
             $this->setData("updatedProducts", $this->updatedProducts);
             $this->setData("disabledProducts", $this->disabledProducts);
-            $this->setData("messages", $this->messages);
+            //$this->setData("messages", $this->messages);
         } else {
             $this->setData("errors", $this->errors);
         }

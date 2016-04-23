@@ -158,7 +158,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
 
         $installer->getConnection()->createTable($table);
 
-        
+
 
         /**
          * Create table glugox_import_products
@@ -293,10 +293,10 @@ class UpgradeSchema implements UpgradeSchemaInterface {
         )->addIndex(
             $installer->getIdxName(
                 $installer->getTable('glugox_import_products'),
-                ['sku'],
+                ['importer_code','sku'],
                 \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
             ),
-            ['sku'],
+            ['importer_code','sku'],
             ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
         )->addForeignKey(
                 $installer->getFkName(
@@ -311,6 +311,69 @@ class UpgradeSchema implements UpgradeSchemaInterface {
                 \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
             );
 
+        $installer->getConnection()->createTable($table);
+
+
+
+        /**
+         * Create table 'glugox_integration_result'
+         */
+        $table = $installer->getConnection()
+            ->newTable($installer->getTable('glugox_integration_result'))
+            ->addColumn(
+                'result_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['identity' => true, 'unsigned' => true, 'nullable' => false, 'primary' => true],
+                'Result Id'
+            )
+            ->addColumn(
+                'integration_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['unsigned' => true, 'nullable' => false, 'default' => '0'],
+                'Integration Id'
+            )
+            ->addColumn(
+                'result_code',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['unsigned' => true, 'default' => '0'],
+                'Result Code'
+            )
+            ->addColumn(
+                'started_at',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                null,
+                ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT],
+                'Start Time'
+            )
+            ->addColumn(
+                'finished_at',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                null,
+                ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT],
+                'Finish Time'
+            )
+            ->addColumn(
+                'result_text',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                null,
+                [],
+                'Result Text'
+            )
+            ->addIndex(
+                $installer->getIdxName('glugox_integration_result', ['integration_id']),
+                ['integration_id']
+            )
+            ->addForeignKey(
+                $installer->getFkName('glugox_integration_result', 'integration_id', 'glugox_integration', 'integration_id'),
+                'integration_id',
+                $installer->getTable('glugox_integration'),
+                'integration_id',
+                \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
+            )
+            ->setComment('Integration Result');
         $installer->getConnection()->createTable($table);
 
 
@@ -342,25 +405,25 @@ class UpgradeSchema implements UpgradeSchemaInterface {
                 'Log Code'
             )
             ->addColumn(
-                'started_at',
-                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
-                null,
-                ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT],
-                'Start Time'
-            )
-            ->addColumn(
-                'finished_at',
-                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
-                null,
-                ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT],
-                'Finish Time'
+                'log_alias',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                255,
+                [],
+                'Log Alias'
             )
             ->addColumn(
                 'log_text',
                 \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
-                null,
+                255,
                 [],
                 'Log Text'
+            )
+            ->addColumn(
+                'created_at',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                null,
+                ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT],
+                'Log Time'
             )
             ->addIndex(
                 $installer->getIdxName('glugox_integration_log', ['integration_id']),

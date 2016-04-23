@@ -25,4 +25,21 @@ class Log extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     {
         $this->_init('glugox_integration_log', 'log_id');
     }
+
+    /**
+     * Returns messages from the import log table.
+     * If $fromTime argument is passed, it returns only messages at and after that time.
+     *
+     * @param string $fromTime Msyql datetime format string
+     * @return array
+     */
+    public function getImportLogMessagesFrom($fromTime="0000-00-00 00:00:00"){
+        $connection = $this->getConnection();
+        $select = $connection->select()
+                ->from($this->getMainTable())
+                ->where('created_at >= ?', $fromTime)
+        ;
+
+        return $connection->fetchAll($select);
+    }
 }

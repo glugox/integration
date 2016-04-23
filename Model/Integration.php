@@ -16,6 +16,8 @@ namespace Glugox\Integration\Model;
  *
  * @method \string getName()
  * @method \Glugox\Integration\Model\Integration setName(\string $name)
+ * @method \string getSkuPrefix()
+ * @method \Glugox\Integration\Model\Integration setSkuPrefix(\string $value)
  * @method \string getIntegrationCode()
  * @method \Glugox\Integration\Model\Integration setIntegrationCode(\string $name)
  * @method \Glugox\Integration\Model\Integration setStatus(\int $value)

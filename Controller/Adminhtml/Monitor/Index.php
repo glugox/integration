@@ -25,13 +25,17 @@ class Index extends Integration {
      */
     public function execute() {
 
+        $datetime = $this->getRequest()->getParam("fromTime", null);
+        $messages = $this->_service->getImportLogMessagesFrom($datetime);
 
-        //$this->_manager->start();
+        if(!\count($messages)){
+            $messages = ["delete-all"];
+        }
 
         if ($this->getRequest()->isXmlHttpRequest()) {
             $this->getResponse()->representJson(
                     $this->jsonHelper->jsonEncode(
-                            ['progress' => 63]
+                         $messages
                     )
             );
         } else {

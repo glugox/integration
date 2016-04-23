@@ -25,7 +25,9 @@ class Index extends Integration {
      */
     public function execute() {
 
-        $result = $this->_manager->run();
+        $command = new \Glugox\Integration\Console\Command\ImportCommand($this->_manager, $this->_registry);
+
+        $result = $this->_manager->run("", $command->getDefinition());
         if ($this->getRequest()->isXmlHttpRequest()) {
             $jsonResult = $this->jsonHelper->jsonEncode($result);
             $this->getResponse()->representJson($jsonResult);

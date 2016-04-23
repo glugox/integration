@@ -134,8 +134,6 @@ class Manager implements ManagerInterface {
         );
         $this->_currentIntegrationIndex = 0;
         $this->_prepareIntegrations();
-
-        //$this->_result['current'] = $this->_helper->getConfig('integration_activity/current');
     }
 
 

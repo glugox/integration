@@ -8,9 +8,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Glugox\Integration\Model\Integration\Import;
 
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Glugox\Integration\Model\Integration\Log;
 
 /**
  * Description of Importer
@@ -18,14 +20,14 @@ use Magento\Framework\App\Filesystem\DirectoryList;
  * @author Eko
  */
 abstract class Importer implements \Glugox\Integration\Model\Integration\Import\ImporterInterface {
-
     /*
      * Integration Status values
      */
-    const IMPORTER_STATUS_START       = 101;
-    const IMPORTER_STATUS_VALIDATION  = 111;
-    const IMPORTER_STATUS_ERROR       = 501;
-    const IMPORTER_STATUS_SUCCESS     = 901;
+
+    const IMPORTER_STATUS_START = 101;
+    const IMPORTER_STATUS_VALIDATION = 111;
+    const IMPORTER_STATUS_ERROR = 501;
+    const IMPORTER_STATUS_SUCCESS = 901;
 
     /**
      * @var \Magento\Framework\Filesystem
@@ -58,17 +60,28 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
     /** @var \Glugox\Integration\Model\Integration\LogFactory */
     protected $_logFactory;
 
+    /** @var \Glugox\Integration\Model\Integration\ResultFactory */
+    protected $_resultFactory;
+
     /** @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone */
     protected $_timezone;
+
+    /** @var string $_curlError */
+    protected $_curlError;
+
+    /** @var string $uniqueId */
+    protected $_uniqueId;
+
+
 
     /**
      *
      * @param type $status
      * @return \Glugox\Integration\Model\Integration\Import\Importer
      */
-    protected function setStatus($status){
+    protected function setStatus($status) {
         $this->_status = $status;
-        switch ($status){
+        switch ($status) {
             case self::IMPORTER_STATUS_START:
                 // mark this integration as active/started
                 $this->_integration->setStatus(\Glugox\Integration\Model\Integration::STATUS_ACTIVE)->save();
@@ -78,24 +91,25 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
                 // mark this integration as inactive/finished
                 $this->_integration->setStatus(\Glugox\Integration\Model\Integration::STATUS_INACTIVE)->save();
                 break;
-
         }
         return $this;
     }
 
+
     /**
      * @return int status value
      */
-    public function getStatus(){
+    public function getStatus() {
         return $this->_status;
     }
+
 
     /**
      *
      * @param \Glugox\Integration\Model\Integration $integration
      * @return \Glugox\Integration\Model\Integration\Import\Importer
      */
-    public function setIntegration(\Glugox\Integration\Model\Integration $integration){
+    public function setIntegration(\Glugox\Integration\Model\Integration $integration) {
         $this->_integration = $integration;
         $this->_result->integrationId = $this->_integration->getId();
         return $this;
@@ -106,19 +120,24 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
      * @param \Glugox\Integration\Helper\Data $helper
      */
     public function __construct(
-            \Glugox\Integration\Helper\Data $helper,
+    \Glugox\Integration\Helper\Data $helper,
             \Glugox\Integration\Model\Integration\LogFactory $logFactory,
+            \Glugox\Integration\Model\Integration\ResultFactory $resultFactory,
             \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
             \Magento\Framework\Filesystem $filesystem,
             \Glugox\Integration\Model\Integration\Import\ProductFactory $importProductFactory
-            ) {
+    ) {
         $this->_helper = $helper;
         $this->_result = new \Glugox\Integration\Model\ImportResult;
         $this->_logFactory = $logFactory;
+        $this->_resultFactory = $resultFactory;
         $this->_timezone = $timezone;
         $this->_filesystem = $filesystem;
         $this->_importProductFactory = $importProductFactory;
+
+        $this->_uniqueId = uniqid();
     }
+
 
     /**
      * Runs the data import
@@ -128,7 +147,7 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
     public function import() {
         $this->_start();
         $validation = $this->_validate();
-        if(true === $validation){
+        if (true === $validation) {
             $this->_import();
         }
         $this->_end();
@@ -136,34 +155,37 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
         return $this->_result;
     }
 
+
     /**
      * Starts the import
      */
-    protected function _start(){
+    protected function _start() {
 
         $this->_errors = array();
         $this->_result->startedAt = strftime('%Y-%m-%d %H:%M:%S', $this->_timezone->scopeTimeStamp());
         $this->setStatus(self::IMPORTER_STATUS_START);
 
-        $this->_info("Importer start (".$this->_integration->getIntegrationCode().")...");
+        $this->_info("Importer start (" . $this->_integration->getIntegrationCode() . ")");
         //$this->_info($this->_integration->getData());
     }
+
 
     /**
      * Ends the import
      */
-    protected function _end(){
+    protected function _end() {
         $this->setStatus(self::IMPORTER_STATUS_SUCCESS);
 
         // mark this integration as inactive/finished
         $this->_integration->setStatus(\Glugox\Integration\Model\Integration::STATUS_INACTIVE)->save();
         $this->_result->finishedAt = strftime('%Y-%m-%d %H:%M:%S', $this->_timezone->scopeTimeStamp());
 
-        $this->_info("Importer end (".$this->_integration->getIntegrationCode().")...");
+        $this->_info("Importer end (" . $this->_integration->getIntegrationCode() . ")");
 
-        // log the import results
-        $this->_logImportResult($this->_result);
+        // insert the import results
+        $this->_insertImportResult($this->_result);
     }
+
 
     /**
      * Runs the data import
@@ -172,7 +194,7 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
      */
     protected function _import() {
         $serviceUrl = $this->_integration->getServiceUrl();
-        $this->_info("Data loading: ".$serviceUrl."...");
+        $this->_info("Data loading: " . $serviceUrl . "...");
 
         $xml = $this->_loadCurl($serviceUrl);
         $this->_importXML($xml);
@@ -186,10 +208,12 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
      * @param type $exec
      * @return resource|string
      */
-    protected function _buildCurl( $serviceUrl = null, $exec = false ){
+    protected function _buildCurl($serviceUrl = null, $exec = false) {
 
+
+        $this->_curlError = false;
         $ch = curl_init();
-        if($serviceUrl){
+        if ($serviceUrl) {
             curl_setopt($ch, CURLOPT_URL, $serviceUrl);
         }
         curl_setopt($ch, CURLOPT_VERBOSE, 1);
@@ -197,17 +221,17 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
         curl_setopt($ch, CURLOPT_SSLVERSION, 3);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 900);
 
-        if($exec){
+        if ($exec) {
             $xmlString = curl_exec($ch);
-            $error = curl_error($ch);
+            $this->_curlError = curl_error($ch);
             curl_close($ch);
 
-            return !$error ? $xmlString : $error;
-        }else{
+            return !$this->_curlError ? $xmlString : false;
+        } else {
             return $ch;
         }
-
     }
+
 
     /**
      * Loads url
@@ -215,71 +239,107 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
      * @param type $serviceUrl
      * @return string
      */
-    protected function _loadCurl( $serviceUrl = null ){
+    protected function _loadCurl($serviceUrl = null) {
         return $this->_buildCurl($serviceUrl, true);
     }
 
-        /**
+
+    /**
      * Imports xml string of products to a helper products table.
      *
      * @param strinf $xml
      */
-    protected function _importXML($xmlString){
+    protected function _importXML($xmlString) {
         // write the xml to disc
-            $filename = "glugox/integration/import/" . $this->_integration->getIntegrationCode() . "-" . strftime('%Y-%m-%d_%H.%M.%S', $this->_timezone->scopeTimeStamp()) . ".xml";
-            $this->_filesystem->getDirectoryWrite(DirectoryList::VAR_DIR)->writeFile($filename, $xmlString);
+        $filename = "glugox/integration/import/" . $this->_integration->getIntegrationCode() . "-" . strftime('%Y-%m-%d_%H.%M.%S', $this->_timezone->scopeTimeStamp()) . ".xml";
+        $this->_filesystem->getDirectoryWrite(DirectoryList::VAR_DIR)->writeFile($filename, $xmlString);
 
-            try {
-                $xml = simplexml_load_string($xmlString);
-            } catch (Exception $ex) {
-                $this->_info($ex->getMessage(), true);
+        $xml = simplexml_load_string($xmlString, null, LIBXML_NOERROR | LIBXML_NOWARNING);
+
+        if ($xml) {
+
+            /**
+             * Insert data from xml into the helper tmp table 'glugox_import_products'
+             */
+            $importProduct = $this->_importProductFactory->create();
+            $xmlProducts = $xml->Table;
+            $nProducts = \count($xmlProducts);
+            $this->_info("Inserting products into helper table (" . $nProducts . ")...");
+
+            $progress = 0;
+            $prIndex = 0;
+            $this->_info("Xml parsing: {$progress}%", false, null, "xml_parse_progress_" . $this->_uniqueId);
+
+            foreach ($xmlProducts as $xmlProduct) {
+                $productName = (string) $xmlProduct->ProductName;
+
+                $importProduct->unsetData();
+                $importProduct->setData([
+                    "importer_code" => (string) $this->_integration->getIntegrationCode(),
+                    "sku" => $this->_integration->getSkuPrefix() . (string) $xmlProduct->ProductCode,
+                    "category" => (string) $xmlProduct->ProductType,
+                    "name" => (string) $xmlProduct->ProductName,
+                    "warranty" => (string) $xmlProduct->Warranty,
+                    "brend" => (string) $xmlProduct->Brand,
+                    "description" => (string) $xmlProduct->MarketingDescription,
+                    "image_url" => (string) $xmlProduct->ProductImageUrl,
+                    "time_changed" => (string) $xmlProduct->ChangeDateTime
+                ]);
+
+                $importProduct->save();
+
+                $progress = \floor($prIndex/$nProducts * 100);
+                $this->_info("Xml parsing:<strong> {$progress}%</strong>", false, null, "xml_parse_progress_" . $this->_uniqueId);
+                ++$prIndex;
             }
-
-            if ($xml) {
-
-                /**
-                 * Insert data from xml into the helper tmp table 'glugox_import_products'
-                 */
-                $importProduct = $this->_importProductFactory->create();
-                $xmlProducts = $xml->Table;
-                $this->_info("Inserting products into helper table...");
-                foreach ($xmlProducts as $xmlProduct) {
-                    $productName = (string) $xmlProduct->ProductName;
-
-                    $importProduct->unsetData();
-                    $importProduct->setData([
-                        "importer_code"  => (string) $this->_integration->getIntegrationCode(),
-                        "sku"            => (string) $xmlProduct->ProductCode,
-                        "category"       => (string) $xmlProduct->ProductType,
-                        "name"           => (string) $xmlProduct->ProductName,
-                        "warranty"       => (string) $xmlProduct->Warranty,
-                        "brend"          => (string) $xmlProduct->Brand,
-                        "description"    => (string) $xmlProduct->MarketingDescription,
-                        "image_url"      => (string) $xmlProduct->ProductImageUrl,
-                        "time_changed"   => (string) $xmlProduct->ChangeDateTime
-                    ]);
-
-                    $importProduct->save();
-                    $this->_info(".");
-                }
-            }
+            $this->_info("Xml parsing: 100%", false, null, "xml_parse_progress_" . $this->_uniqueId);
+        } else {
+            $this->_info("Invalid xml", true);
+        }
     }
+
 
     /**
      *
      * @return boolean
      */
-    protected function _validate(){
+    protected function _validate() {
         return !$this->_result->hasErrors();
     }
+
+
+    /**
+     * Insert import result, adds data to glugox_integration_result table.
+     *
+     * @param \Glugox\Integration\Model\ImportResult $result
+     */
+    protected function _insertImportResult() {
+        $this->_resultFactory->create()->addResultData($this->_result)->save();
+    }
+
 
     /**
      * Logs import result, adds data to glugox_integration_log table.
      *
-     * @param \Glugox\Integration\Model\ImportResult $result
+     * @param string $msg
+     * @param boolean $isError
      */
-    protected function _logImportResult() {
-        $this->_logFactory->create()->addResultData($this->_result)->save();
+    protected function _insertImportLog($msg, $isError = false, $alias = null) {
+
+        $log = null;
+        if(null !== $alias){
+            $log = $this->_logFactory->create()->load($alias, 'log_alias');
+        }
+        if (!$log) {
+            $log = $this->_logFactory->create();
+        }
+
+        $log->addResultData($this->_result)
+                ->setCreatedAt(strftime('%Y-%m-%d %H:%M:%S', $this->_timezone->scopeTimeStamp()))
+                ->setLogText($msg)
+                ->setLogAlias($alias)
+                ->setLogCode($isError ? Log::LOG_CODE_ERROR : Log::LOG_CODE_SUCCESS)
+                ->save();
     }
 
 
@@ -288,18 +348,27 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
      * @param type $msg
      * @param type $isError
      */
-    protected function _info($msg, $isError=false){
+    protected function _info($msg, $isError = false, $color = null,
+            $alias = null) {
         if (!is_string($msg)) {
             $msg = '<pre>' . print_r($msg, true) . '</pre>';
         }
-        if($isError){
+        if ($isError) {
+            $color = "#ff0000";
             $msg = "ERROR: " . $msg;
+        }
+        if ($color) {
+            $msg = '<span style="color:' . $color . '">' . $msg . '</span>';
         }
         $this->_helper->info($msg);
         if ("." === $msg) {
             return null;
         }
+        // store to result object, not yet to db table
         $this->_result->addMessage($msg, $isError);
+
+        // store log to db table
+        $this->_insertImportLog($msg, $isError, $alias);
     }
 
 

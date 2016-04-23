@@ -11,33 +11,29 @@
 namespace Glugox\Integration\Model\Integration;
 
 /**
- * Integration log model
+ * Integration result model
  *
- * @method \Glugox\Integration\Model\ResourceModel\Integration\Log _getResource()
- * @method \Glugox\Integration\Model\ResourceModel\Integration\Log getResource()
+ * @method \Glugox\Integration\Model\ResourceModel\Integration\Result _getResource()
+ * @method \Glugox\Integration\Model\ResourceModel\Integration\Result getResource()
  * @method int getIntegrationId()
- * @method \Glugox\Integration\Model\Integration\Log setIntegrationId(int $value)
- * @method int getLogCode()
- * @method \Glugox\Integration\Model\Integration\Log setLogCode(int $value)
- * @method string getLogAlias()
- * @method \Glugox\Integration\Model\Integration\Log setLogAlias(string $value)
+ * @method \Glugox\Integration\Model\Integration\Result setIntegrationId(int $value)
+ * @method int getResultCode()
+ * @method \Glugox\Integration\Model\Integration\Result setResultCode(int $value)
  * @method string getStartedAt()
- * @method \Glugox\Integration\Model\Integration\Log setStartedAt(string $value)
+ * @method \Glugox\Integration\Model\Integration\Result setStartedAt(string $value)
  * @method string getFinishedAt()
- * @method \Glugox\Integration\Model\Integration\Log setFinishedAt(string $value)
- * @method string getLogText()
- * @method \Glugox\Integration\Model\Integration\Log setLogText(string $value)
- * @method string getCreatedAt()
- * @method \Glugox\Integration\Model\Integration\Log setCreatedAt(string $value)
- *
+ * @method \Glugox\Integration\Model\Integration\Result setFinishedAt(string $value)
+ * @method string getResultText()
+ * @method \Glugox\Integration\Model\Integration\Result setResultText(string $value)
  *
  * @author Glugox
  */
-class Log extends \Magento\Framework\Model\AbstractModel
+class Result extends \Magento\Framework\Model\AbstractModel
 {
 
-    const LOG_CODE_SUCCESS = 1;
-    const LOG_CODE_ERROR = 0;
+
+    const RESULT_CODE_SUCCESS = 1;
+    const RESULT_CODE_ERROR = 0;
 
     /**
      * Construct
@@ -65,7 +61,7 @@ class Log extends \Magento\Framework\Model\AbstractModel
      */
     protected function _construct()
     {
-        $this->_init('Glugox\Integration\Model\ResourceModel\Integration\Log');
+        $this->_init('Glugox\Integration\Model\ResourceModel\Integration\Result');
     }
 
     /**
@@ -76,21 +72,13 @@ class Log extends \Magento\Framework\Model\AbstractModel
      */
     public function addResultData(\Glugox\Integration\Model\ImportResult $result)
     {
+        $this->setResultText($result->getSummary());
         $this->setIntegrationId($result->integrationId);
-        $this->setCreatedAt();
+        $this->setResultCode($result->isSuccess() ? self::RESULT_CODE_SUCCESS : self::RESULT_CODE_ERROR);
+        $this->setStartedAt($result->startedAt);
+        $this->setFinishedAt($result->finishedAt);
 
         return $this;
-    }
-
-    /**
-     * Returns messages from the import log table.
-     * If $fromTime argument is passed, it returns only messages at and after that time.
-     *
-     * @param string $fromTime Msyql datetime format string
-     * @return array
-     */
-    public function getImportLogMessagesFrom($fromTime){
-        return $this->getResource()->getImportLogMessagesFrom($fromTime);
     }
 
 }

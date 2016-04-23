@@ -16,7 +16,7 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\StringInput;
 
 /**
- * Class GreetingCommand
+ * Class ImportCommand
  */
 class ImportCommand extends Command {
 

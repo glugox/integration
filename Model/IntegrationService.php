@@ -13,6 +13,7 @@ namespace Glugox\Integration\Model;
 
 use Glugox\Integration\Api\IntegrationServiceInterface;
 use Glugox\Integration\Model\IntegrationFactory;
+use Glugox\Integration\Model\Integration\LogFactory;
 use Glugox\Integration\Model\Integration as IntegrationModel;
 use Glugox\Integration\Exception\IntegrationException;
 
@@ -27,12 +28,18 @@ class IntegrationService implements IntegrationServiceInterface {
     /**
      * When integrations resets, these tables are being reseted/truncated
      */
-    const TRUNCATEABLE_TABLES = ["glugox_import_products"];
+    const TRUNCATEABLE_TABLES = ["glugox_import_products", "glugox_integration_log"];
 
     /**
      * @var IntegrationFactory
      */
     protected $_integrationFactory;
+
+
+    /**
+     * @var LogFactory
+     */
+    protected $_logFactory;
 
     /**
      * Construct and initialize Integration Factory
@@ -40,8 +47,11 @@ class IntegrationService implements IntegrationServiceInterface {
      * @param IntegrationFactory $integrationFactory
      * @param IntegrationOauthService $oauthService
      */
-    public function __construct(IntegrationFactory $objectManager) {
+    public function __construct(
+            IntegrationFactory $objectManager,
+            LogFactory $logFactory) {
         $this->_integrationFactory = $objectManager;
+        $this->_logFactory = $logFactory;
     }
 
 
@@ -152,7 +162,7 @@ class IntegrationService implements IntegrationServiceInterface {
 
     /**
      * Returns number of records in the helper import ptoducts table
-     * 
+     *
      * @return int
      */
     public function getNumImportProductsLeft() {
@@ -189,6 +199,22 @@ class IntegrationService implements IntegrationServiceInterface {
         }
         return $integration;
     }
+
+
+    /**
+     * Returns messages from the import log table.
+     * If $fromTime argument is passed, it returns only messages at and after that time.
+     *
+     * @param string $fromTime Msyql datetime format string
+     * @return array
+     */
+    public function getImportLogMessagesFrom($fromTime) {
+
+        $log = $this->_logFactory->create()->getImportLogMessagesFrom($fromTime);
+        return $log;
+    }
+
+
 
 
 }

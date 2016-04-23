@@ -35,11 +35,12 @@ class ImporterWithCert extends Importer {
     public function __construct(
             \Glugox\Integration\Helper\Data $helper,
             \Glugox\Integration\Model\Integration\LogFactory $logFactory,
+            \Glugox\Integration\Model\Integration\ResultFactory $resultFactory,
             \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
             \Magento\Framework\Filesystem $filesystem,
             \Glugox\Integration\Model\Integration\Import\ProductFactory $importProductFactory
     ) {
-        parent::__construct($helper, $logFactory, $timezone, $filesystem, $importProductFactory);
+        parent::__construct($helper, $logFactory, $resultFactory, $timezone, $filesystem, $importProductFactory);
 
         $this->_rootDirectory = $filesystem->getDirectoryWrite(DirectoryList::ROOT);
 
@@ -51,7 +52,7 @@ class ImporterWithCert extends Importer {
      */
     public function import() {
 
-        $this->_info("[ImporterWithCert]");
+        $this->_info("[ImporterWithCert]", false, "green");
         $import = parent::import();
     }
 
@@ -84,6 +85,7 @@ class ImporterWithCert extends Importer {
             $this->_info($error, true);
         } else if ($realXml) {
 
+            //$this->_info("Loaded xml: " . $realXml);
             $this->_importXML($realXml);
         }
     }
