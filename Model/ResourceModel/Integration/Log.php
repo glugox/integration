@@ -31,14 +31,20 @@ class Log extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      * If $fromTime argument is passed, it returns only messages at and after that time.
      *
      * @param string $fromTime Msyql datetime format string
+     * @param string $integrationRunId Select only from specific integration run, if null -> any
      * @return array
      */
-    public function getImportLogMessagesFrom($fromTime="0000-00-00 00:00:00"){
+    public function getImportLogMessagesFrom($fromTime="0000-00-00 00:00:00", $integrationRunId = null){
+
         $connection = $this->getConnection();
         $select = $connection->select()
                 ->from($this->getMainTable())
                 ->where('created_at >= ?', $fromTime)
         ;
+
+        if(!empty($integrationRunId)){
+            $select->where('integration_run_id = ?', $integrationRunId);
+        }
 
         return $connection->fetchAll($select);
     }

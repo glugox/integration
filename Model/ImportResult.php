@@ -11,6 +11,8 @@
 
 namespace Glugox\Integration\Model;
 
+use Glugox\Integration\Model\Integration\Result;
+
 /**
  * Description of ImportResult
  *
@@ -23,21 +25,35 @@ class ImportResult extends \Magento\Framework\DataObject {
      *
      * @var int
      */
-    public $integrationId;
+    public $integrationId = null;
+
+    /**
+     * Integration run id
+     *
+     * @var int
+     */
+    public $integrationRunId = null;
+
+    /**
+     * Result code
+     *
+     * @var int
+     */
+    public $resultCode = 0;
 
     /**
      * Started at time
      *
      * @var string
      */
-    public $startedAt;
+    public $startedAt = null;
 
     /**
      * Finished at time
      *
      * @var string
      */
-    public $finishedAt;
+    public $finishedAt = null;
 
     /**
      * Array to store created products
@@ -74,6 +90,41 @@ class ImportResult extends \Magento\Framework\DataObject {
      */
     public $messages = [];
 
+    /** @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone */
+    protected $_timezone;
+
+    /** @var \Glugox\Integration\Model\Integration\ResultFactory */
+    protected $_resultFactory;
+
+
+    /**
+     * Constructor
+     */
+    public function __construct(
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
+        \Glugox\Integration\Model\Integration\ResultFactory $resultFactory,
+        array $data = []
+    )
+    {
+        $this->_timezone = $timezone;
+        $this->_resultFactory = $resultFactory;
+        parent::__construct($data);
+    }
+
+
+    /**
+     * Insert import result, adds data to glugox_integration_result table.
+     */
+    protected function _insertImportResult() {
+
+        $model = $this->_resultFactory->create()->load($this->integrationRunId, "integration_run_id");
+        if(!$model->getId()){
+            $model = $this->_resultFactory->create();
+        }
+        $model->addResultData($this)->save();
+    }
+
+
     /**
      *
      * @param type $msg
@@ -84,8 +135,38 @@ class ImportResult extends \Magento\Framework\DataObject {
 
         if ($isError) {
             $this->errors[] = $msg;
+            $this->resultCode = Result::RESULT_CODE_ERROR;
         }
         $this->messages[] = $msg;
+
+        return $this;
+    }
+
+
+    /**
+     * @return \Glugox\Integration\Model\ImportResult
+     * @param \Glugox\Integration\Model\Integration $integration
+     */
+    public function handleStart(\Glugox\Integration\Model\Integration $integration){
+
+        $this->resultCode = Result::RESULT_CODE_RUNNING;
+        $this->integrationRunId = $integration->getIntegrationCode() . '-' . strftime('%Y%m%d%H%M%S', $this->_timezone->scopeTimeStamp());
+        $this->startedAt = strftime('%Y-%m-%d %H:%M:%S', $this->_timezone->scopeTimeStamp());
+
+        $this->_insertImportResult();
+
+        return $this;
+    }
+
+    /**
+     * @return \Glugox\Integration\Model\ImportResult
+     */
+    public function handleFinish(){
+
+        $this->resultCode = !$this->isSuccess() ? Result::RESULT_CODE_ERROR : Result::RESULT_CODE_SUCCESS;
+        $this->finishedAt = strftime('%Y-%m-%d %H:%M:%S', $this->_timezone->scopeTimeStamp());
+
+        $this->_insertImportResult();
 
         return $this;
     }
@@ -154,14 +235,13 @@ class ImportResult extends \Magento\Framework\DataObject {
         $this->setData("numCreatedProducts", \count($this->createdProducts));
         $this->setData("numUpdatedProducts", \count($this->updatedProducts));
         $this->setData("numDisabledProducts", \count($this->disabledProducts));
+        $this->setData("errors", $this->errors);
 
         if ($detailed) {
             $this->setData("createdProducts", $this->createdProducts);
             $this->setData("updatedProducts", $this->updatedProducts);
             $this->setData("disabledProducts", $this->disabledProducts);
-            //$this->setData("messages", $this->messages);
         } else {
-            $this->setData("errors", $this->errors);
         }
         return $this->toJson();
     }

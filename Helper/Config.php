@@ -111,8 +111,6 @@ class Config extends AbstractHelper {
 
     /**
      * Get config for this module.
-     * To get store specific config:
-     * getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
      *
      * To avoid config reinitialization and stores reinitialization,
      * we are just setting new config values to cache if we need to get it back
@@ -131,8 +129,6 @@ class Config extends AbstractHelper {
 
     /**
      * Set config for this module.
-     * To set store specific config:
-     * setValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
      *
      * To avoid config reinitialization and stores reinitialization,
      * we are just setting new config values to cache if we need to get it back

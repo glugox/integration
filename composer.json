@@ -20,11 +20,18 @@
             "Glugox\\Integration\\": ""
         }
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/glugox/core"
+        }
+    ],
     "authors": [
         {
             "name": "Ervin Beciragic",
             "homepage": "https://www.glugox.com/",
             "role": "Developer"
         }
-    ]
+    ],
+    "minimum-stability": "dev"
 }

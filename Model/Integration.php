@@ -20,6 +20,8 @@ namespace Glugox\Integration\Model;
  * @method \Glugox\Integration\Model\Integration setSkuPrefix(\string $value)
  * @method \string getIntegrationCode()
  * @method \Glugox\Integration\Model\Integration setIntegrationCode(\string $name)
+ * @method \string getIntegrationRunId()
+ * @method \Glugox\Integration\Model\Integration setIntegrationRunId(\string $name)
  * @method \Glugox\Integration\Model\Integration setStatus(\int $value)
  * @method \string getCaFile()
  * @method \Glugox\Integration\Model\Integration setCaFile(\string $value)

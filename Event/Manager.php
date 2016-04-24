@@ -38,6 +38,9 @@ class Manager implements ManagerInterface {
     /** @var int Current integration index */
     protected $_currentIntegrationIndex;
 
+    /** @var bool New cycle means we will import new data from sources to helper tables and start importing into magento db, false means we continue where we left */
+    protected $_isNewCycle = true;
+
     /**
      * @param \Glugox\Integration\Helper\Data $helper
      * @param \Glugox\Integration\Api\IntegrationServiceInterface $service
@@ -54,7 +57,7 @@ class Manager implements ManagerInterface {
      *
      * @param boolean $starting Marker if we are actually staring the integration, so throw error if there are running ones.
      */
-    private function _prepareIntegrations($starting = true) {
+    private function _prepareIntegrations() {
 
         $this->_helper->info("Loading Integrations...");
         $hasIntegrationRunning = false;
@@ -72,18 +75,20 @@ class Manager implements ManagerInterface {
         }
 
         $isForce = $this->_input->getOption(\Glugox\Integration\Console\Command\ImportCommand::FORCE);
-        $numImportProductsLeft = $this->_service->getNumImportProductsLeft();
+        $isReset = $this->_input->getOption(\Glugox\Integration\Console\Command\ImportCommand::RESET);
 
-        if ($starting && !$isForce) {
-            if ($hasIntegrationRunning) {
-                throw new \Glugox\Integration\Exception\IntegrationException(__('One of the integrations is already running, use -f to force the run!'));
-            }
-            if ($numImportProductsLeft) {
-                throw new \Glugox\Integration\Exception\IntegrationException(__('Helper tables are not empty ('.$numImportProductsLeft.'), meaning last import not finished well/yet, use -f to force the run!'));
-            }
+        $numImportProductsLeft = $this->_service->getNumImportProductsLeft();
+        $this->_isNewCycle = 0 === $numImportProductsLeft;
+
+        if ($hasIntegrationRunning) {
+            throw new \Glugox\Integration\Exception\IntegrationException(__('One of the integrations is already running! You must restart apache to stop the script first.'));
         }
 
-        $this->resetAllIntegrations();
+        if($isReset){
+            $this->resetAllIntegrations();
+            $this->_isNewCycle = true;
+        }
+
     }
 
 
@@ -116,10 +121,17 @@ class Manager implements ManagerInterface {
      */
     public function start() {
         $this->_init();
-        $result = $this->runNextImporter();
-        while (false !== $result) {
+
+        if($this->_isNewCycle){
+
             $result = $this->runNextImporter();
+            while (false !== $result) {
+                $result = $this->runNextImporter();
+            }
         }
+
+        // continue with creating/updating real magento products...
+
     }
 
 

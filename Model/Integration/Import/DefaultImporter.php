@@ -21,8 +21,6 @@ class DefaultImporter extends Importer {
      * Runs the data import
      */
     public function import() {
-
-        $this->_info("[DefaultImporter]");
         $import = parent::import();
     }
 

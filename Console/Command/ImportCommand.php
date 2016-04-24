@@ -31,6 +31,11 @@ class ImportCommand extends Command {
     const FORCE = 'force';
 
     /**
+     * Reset option
+     */
+    const RESET = 'reset';
+
+    /**
      * Strict mode
      */
     const STRICT_MODE = 'strict-mode';
@@ -81,6 +86,9 @@ class ImportCommand extends Command {
                     new InputOption(
                             self::FORCE, '-f', InputOption::VALUE_NONE, 'Proceed on error(s)'
                     ),
+                    new InputOption(
+                        self::RESET, '-r', InputOption::VALUE_NONE, 'Reset all integrations ( status to not running ), deletes all products from helper ( tmp ) table. Integration is ready for new clean import.'
+                    ),
         ]);
         parent::configure();
     }
@@ -102,7 +110,7 @@ class ImportCommand extends Command {
         if ($force) {
             $mode = self::STRICT_MODE;
         }
-        $output->writeln('<info>'.  $input->getOption(self::FORCE).' Starting import: ' . $code . ' in ' . $mode . '...</info>');
+        $output->writeln('<info>Starting import: ' . $code . ' in ' . $mode . '...</info>');
 
         // Register the console output to the global registry, so it can be used from other parts to display console info too.
         $this->_registry->register(\Glugox\Integration\Event\Manager::CURRENT_CMD_OUTPUT_INTERFACE, $output);

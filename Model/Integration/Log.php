@@ -17,6 +17,8 @@ namespace Glugox\Integration\Model\Integration;
  * @method \Glugox\Integration\Model\ResourceModel\Integration\Log getResource()
  * @method int getIntegrationId()
  * @method \Glugox\Integration\Model\Integration\Log setIntegrationId(int $value)
+ * @method \string getIntegrationRunId()
+ * @method \Glugox\Integration\Model\Integration setIntegrationRunId(\string $name)
  * @method int getLogCode()
  * @method \Glugox\Integration\Model\Integration\Log setLogCode(int $value)
  * @method string getLogAlias()
@@ -77,6 +79,7 @@ class Log extends \Magento\Framework\Model\AbstractModel
     public function addResultData(\Glugox\Integration\Model\ImportResult $result)
     {
         $this->setIntegrationId($result->integrationId);
+        $this->setIntegrationRunId($result->integrationRunId);
         $this->setCreatedAt();
 
         return $this;
@@ -87,10 +90,11 @@ class Log extends \Magento\Framework\Model\AbstractModel
      * If $fromTime argument is passed, it returns only messages at and after that time.
      *
      * @param string $fromTime Msyql datetime format string
+     * @param string $integrationRunId Select only from specific integration run, if null -> any
      * @return array
      */
-    public function getImportLogMessagesFrom($fromTime){
-        return $this->getResource()->getImportLogMessagesFrom($fromTime);
+    public function getImportLogMessagesFrom($fromTime, $integrationRunId = null){
+        return $this->getResource()->getImportLogMessagesFrom($fromTime, $integrationRunId);
     }
 
 }

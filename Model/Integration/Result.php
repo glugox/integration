@@ -17,6 +17,8 @@ namespace Glugox\Integration\Model\Integration;
  * @method \Glugox\Integration\Model\ResourceModel\Integration\Result getResource()
  * @method int getIntegrationId()
  * @method \Glugox\Integration\Model\Integration\Result setIntegrationId(int $value)
+ * @method \string getIntegrationRunId()
+ * @method \Glugox\Integration\Model\Integration setIntegrationRunId(\string $name)
  * @method int getResultCode()
  * @method \Glugox\Integration\Model\Integration\Result setResultCode(int $value)
  * @method string getStartedAt()
@@ -31,9 +33,9 @@ namespace Glugox\Integration\Model\Integration;
 class Result extends \Magento\Framework\Model\AbstractModel
 {
 
-
-    const RESULT_CODE_SUCCESS = 1;
-    const RESULT_CODE_ERROR = 0;
+    const RESULT_CODE_RUNNING   = 1;
+    const RESULT_CODE_SUCCESS   = 2;
+    const RESULT_CODE_ERROR     = 4;
 
     /**
      * Construct
@@ -74,11 +76,22 @@ class Result extends \Magento\Framework\Model\AbstractModel
     {
         $this->setResultText($result->getSummary());
         $this->setIntegrationId($result->integrationId);
-        $this->setResultCode($result->isSuccess() ? self::RESULT_CODE_SUCCESS : self::RESULT_CODE_ERROR);
+        $this->setIntegrationRunId($result->integrationRunId);
+        $this->setResultCode($result->resultCode);
         $this->setStartedAt($result->startedAt);
         $this->setFinishedAt($result->finishedAt);
 
         return $this;
+    }
+
+
+    /**
+     * Returns last result run id by date
+     *
+     * @return string
+     */
+    public function getLastResultRunId(){
+        return $this->getResource()->getLastResultRunId();
     }
 
 }

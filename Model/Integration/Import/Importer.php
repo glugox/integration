@@ -24,7 +24,7 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
      * Integration Status values
      */
 
-    const IMPORTER_STATUS_START = 101;
+    const IMPORTER_STATUS_RUNNING = 101;
     const IMPORTER_STATUS_VALIDATION = 111;
     const IMPORTER_STATUS_ERROR = 501;
     const IMPORTER_STATUS_SUCCESS = 901;
@@ -60,9 +60,6 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
     /** @var \Glugox\Integration\Model\Integration\LogFactory */
     protected $_logFactory;
 
-    /** @var \Glugox\Integration\Model\Integration\ResultFactory */
-    protected $_resultFactory;
-
     /** @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone */
     protected $_timezone;
 
@@ -82,9 +79,11 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
     protected function setStatus($status) {
         $this->_status = $status;
         switch ($status) {
-            case self::IMPORTER_STATUS_START:
+            case self::IMPORTER_STATUS_RUNNING:
                 // mark this integration as active/started
-                $this->_integration->setStatus(\Glugox\Integration\Model\Integration::STATUS_ACTIVE)->save();
+                $this->_integration->setStatus(\Glugox\Integration\Model\Integration::STATUS_ACTIVE)
+                    ->setIntegrationRunId($this->_result->integrationRunId)
+                    ->save();
                 break;
             case self::IMPORTER_STATUS_ERROR:
             case self::IMPORTER_STATUS_SUCCESS:
@@ -122,15 +121,14 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
     public function __construct(
     \Glugox\Integration\Helper\Data $helper,
             \Glugox\Integration\Model\Integration\LogFactory $logFactory,
-            \Glugox\Integration\Model\Integration\ResultFactory $resultFactory,
             \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
             \Magento\Framework\Filesystem $filesystem,
-            \Glugox\Integration\Model\Integration\Import\ProductFactory $importProductFactory
+            \Glugox\Integration\Model\Integration\Import\ProductFactory $importProductFactory,
+            \Glugox\Integration\Model\ImportResult $result
     ) {
         $this->_helper = $helper;
-        $this->_result = new \Glugox\Integration\Model\ImportResult;
+        $this->_result = $result;
         $this->_logFactory = $logFactory;
-        $this->_resultFactory = $resultFactory;
         $this->_timezone = $timezone;
         $this->_filesystem = $filesystem;
         $this->_importProductFactory = $importProductFactory;
@@ -162,11 +160,13 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
     protected function _start() {
 
         $this->_errors = array();
-        $this->_result->startedAt = strftime('%Y-%m-%d %H:%M:%S', $this->_timezone->scopeTimeStamp());
-        $this->setStatus(self::IMPORTER_STATUS_START);
+
+        // insert the import results to mark the running integration
+        $this->_result->handleStart($this->_integration);
+        $this->setStatus(self::IMPORTER_STATUS_RUNNING);
 
         $this->_info("Importer start (" . $this->_integration->getIntegrationCode() . ")");
-        //$this->_info($this->_integration->getData());
+
     }
 
 
@@ -174,16 +174,16 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
      * Ends the import
      */
     protected function _end() {
-        $this->setStatus(self::IMPORTER_STATUS_SUCCESS);
+
+        $this->setStatus($this->_result->hasErrors() ? self::IMPORTER_STATUS_ERROR : self::IMPORTER_STATUS_SUCCESS);
 
         // mark this integration as inactive/finished
         $this->_integration->setStatus(\Glugox\Integration\Model\Integration::STATUS_INACTIVE)->save();
-        $this->_result->finishedAt = strftime('%Y-%m-%d %H:%M:%S', $this->_timezone->scopeTimeStamp());
 
         $this->_info("Importer end (" . $this->_integration->getIntegrationCode() . ")");
 
         // insert the import results
-        $this->_insertImportResult($this->_result);
+        $this->_result->handleFinish();
     }
 
 
@@ -250,6 +250,7 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
      * @param strinf $xml
      */
     protected function _importXML($xmlString) {
+        
         // write the xml to disc
         $filename = "glugox/integration/import/" . $this->_integration->getIntegrationCode() . "-" . strftime('%Y-%m-%d_%H.%M.%S', $this->_timezone->scopeTimeStamp()) . ".xml";
         $this->_filesystem->getDirectoryWrite(DirectoryList::VAR_DIR)->writeFile($filename, $xmlString);
@@ -276,6 +277,7 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
                 $importProduct->unsetData();
                 $importProduct->setData([
                     "importer_code" => (string) $this->_integration->getIntegrationCode(),
+                    "integration_run_id" => (string) $this->_integration->getIntegrationRunId(),
                     "sku" => $this->_integration->getSkuPrefix() . (string) $xmlProduct->ProductCode,
                     "category" => (string) $xmlProduct->ProductType,
                     "name" => (string) $xmlProduct->ProductName,
@@ -305,16 +307,6 @@ abstract class Importer implements \Glugox\Integration\Model\Integration\Import\
      */
     protected function _validate() {
         return !$this->_result->hasErrors();
-    }
-
-
-    /**
-     * Insert import result, adds data to glugox_integration_result table.
-     *
-     * @param \Glugox\Integration\Model\ImportResult $result
-     */
-    protected function _insertImportResult() {
-        $this->_resultFactory->create()->addResultData($this->_result)->save();
     }
 
 

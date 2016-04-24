@@ -14,6 +14,8 @@ namespace Glugox\Integration\Model\Integration\Import;
  * Importing Product Model.
  *
  * @method \int getImporterCode()
+ * @method \string getIntegrationRunId()
+ * @method \Glugox\Integration\Model\Integration setIntegrationRunId(\string $name)
  * @method \Glugox\Integration\Model\Integration\Import\Product setImporterCode(\int $value)
  * @method \string getSku()
  * @method \Glugox\Integration\Model\Integration\Import\Product setSku(\string $value)

@@ -37,6 +37,10 @@ define([
          */
         lastMsgTime: null,
         /**
+         * current integration run id
+         */
+        runId: null,
+        /**
          * Pushed log ids
          */
         pushedLogIds: [],
@@ -104,13 +108,27 @@ define([
                         } else {
                             var id = parseInt(o.log_id);
                             if ($.inArray(id, that.pushedLogIds) == -1) {
+
+                                if(that.runId && that.runId != o.integration_run_id){
+                                    // new integration run, reset old messages
+                                    that.pushedLogIds = [];
+                                    that.messages = [];
+                                    that.lastMsgTime = null;
+                                    that.runId = o.integration_run_id;
+                                    monitor.html("");
+                                }
+                                
                                 that.messages.push(o);
                                 that.lastMsgTime = o.created_at;
+                                that.runId = o.integration_run_id;
                                 that.pushedLogIds.push(id);
                                 console.log(that.pushedLogIds);
                                 if (o.log_alias) {
-                                    that.aliasMessages[o.log_alias] = o;
+                                   that.aliasMessages[o.log_alias] = o;
                                 }
+
+
+
                             } else {
                                 if (o.log_alias) {
                                     that.aliasMessages[o.log_alias] = o;

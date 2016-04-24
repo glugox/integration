@@ -14,6 +14,7 @@ namespace Glugox\Integration\Model;
 use Glugox\Integration\Api\IntegrationServiceInterface;
 use Glugox\Integration\Model\IntegrationFactory;
 use Glugox\Integration\Model\Integration\LogFactory;
+use Glugox\Integration\Model\Integration\ResultFactory;
 use Glugox\Integration\Model\Integration as IntegrationModel;
 use Glugox\Integration\Exception\IntegrationException;
 
@@ -28,7 +29,7 @@ class IntegrationService implements IntegrationServiceInterface {
     /**
      * When integrations resets, these tables are being reseted/truncated
      */
-    const TRUNCATEABLE_TABLES = ["glugox_import_products", "glugox_integration_log"];
+    const TRUNCATEABLE_TABLES = ["glugox_import_products"];
 
     /**
      * @var IntegrationFactory
@@ -42,16 +43,25 @@ class IntegrationService implements IntegrationServiceInterface {
     protected $_logFactory;
 
     /**
+     * @var ResultFactory
+     */
+    protected $_resultFactory;
+
+    /**
      * Construct and initialize Integration Factory
      *
-     * @param IntegrationFactory $integrationFactory
-     * @param IntegrationOauthService $oauthService
+     * IntegrationService constructor.
+     * @param \Glugox\Integration\Model\IntegrationFactory $objectManager
+     * @param LogFactory $logFactory
+     * @param ResultFactory $resultFactory
      */
     public function __construct(
             IntegrationFactory $objectManager,
-            LogFactory $logFactory) {
+            LogFactory $logFactory,
+            ResultFactory $resultFactory) {
         $this->_integrationFactory = $objectManager;
         $this->_logFactory = $logFactory;
+        $this->_resultFactory = $resultFactory;
     }
 
 
@@ -206,11 +216,12 @@ class IntegrationService implements IntegrationServiceInterface {
      * If $fromTime argument is passed, it returns only messages at and after that time.
      *
      * @param string $fromTime Msyql datetime format string
+     * @param string $integrationRunId Select only from specific integration run, if null -> any
      * @return array
      */
-    public function getImportLogMessagesFrom($fromTime) {
-
-        $log = $this->_logFactory->create()->getImportLogMessagesFrom($fromTime);
+    public function getImportLogMessagesFrom($fromTime, $integrationRunId=null) {
+        $integrationRunId = $this->_resultFactory->create()->getLastResultRunId();
+        $log = $this->_logFactory->create()->getImportLogMessagesFrom($fromTime, $integrationRunId);
         return $log;
     }
 

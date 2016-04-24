@@ -61,6 +61,12 @@ class UpgradeSchema implements UpgradeSchemaInterface {
             ['identity' => true, 'unsigned' => true, 'nullable' => false, 'primary' => true],
             'Integration ID'
         )->addColumn(
+            'integration_run_id',
+            \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            255,
+            ['nullable' => true],
+            'Unique identifier for each run of the integration, null if never ran'
+        )->addColumn(
             'integration_code',
             \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
             255,
@@ -149,6 +155,14 @@ class UpgradeSchema implements UpgradeSchemaInterface {
         )->addIndex(
             $installer->getIdxName(
                 $installer->getTable('glugox_integration'),
+                ['integration_run_id'],
+                \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
+            ),
+            ['integration_run_id'],
+            ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
+        )->addIndex(
+            $installer->getIdxName(
+                $installer->getTable('glugox_integration'),
                 ['integration_code'],
                 \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
             ),
@@ -200,6 +214,12 @@ class UpgradeSchema implements UpgradeSchemaInterface {
             255,
             ['nullable' => false],
             'Code of the importer from db tbale: glugox_integration'
+        )->addColumn(
+            'integration_run_id',
+            \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            255,
+            ['nullable' => false],
+            'Unique identifier for each run of the integration'
         )->addColumn(
             'sku',
             \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
@@ -335,6 +355,13 @@ class UpgradeSchema implements UpgradeSchemaInterface {
                 'Integration Id'
             )
             ->addColumn(
+                'integration_run_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                255,
+                ['nullable' => false],
+                'Unique identifier for each run of the integration'
+            )
+            ->addColumn(
                 'result_code',
                 \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
                 null,
@@ -352,7 +379,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
                 'finished_at',
                 \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
                 null,
-                ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT],
+                ['nullable' => true],
                 'Finish Time'
             )
             ->addColumn(
@@ -365,6 +392,15 @@ class UpgradeSchema implements UpgradeSchemaInterface {
             ->addIndex(
                 $installer->getIdxName('glugox_integration_result', ['integration_id']),
                 ['integration_id']
+            )
+            ->addIndex(
+                $installer->getIdxName(
+                    $installer->getTable('glugox_integration_result'),
+                    ['integration_run_id'],
+                    \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
+                ),
+                ['integration_run_id'],
+                ['type' => \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE]
             )
             ->addForeignKey(
                 $installer->getFkName('glugox_integration_result', 'integration_id', 'glugox_integration', 'integration_id'),
@@ -396,6 +432,13 @@ class UpgradeSchema implements UpgradeSchemaInterface {
                 null,
                 ['unsigned' => true, 'nullable' => false, 'default' => '0'],
                 'Integration Id'
+            )
+            ->addColumn(
+                'integration_run_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                255,
+                ['nullable' => false],
+                'Unique identifier for each run of the integration'
             )
             ->addColumn(
                 'log_code',
